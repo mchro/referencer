@@ -297,7 +297,7 @@ void Document::updateRelFileName (Glib::ustring const &libfilename)
 
 			lib_path = lib_path->get_parent();
 			up_dir_level += "../";
-			if (lib_path == 0) {
+			if (!lib_path) {
 				doc_is_relative_to_library = false;
 				break;
 			}
