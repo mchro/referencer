@@ -10,14 +10,12 @@ EXTRA_DIST =	\
 	intltool-update.in	\
 	referencer.spec.in	\
 	referencer.spec \
-	gnome-doc-utils.make \
 	m4 \
 	libsexymm
 
 DISTCLEANFILES =	\
 	intltool-extract	\
 	intltool-merge		\
-	gnome-doc-utils.make \
 	intltool-update
 
 ## Use this so distcheck doesn't cry about the mime cache

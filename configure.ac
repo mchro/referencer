@@ -19,7 +19,7 @@ AM_INIT_AUTOMAKE([-Wno-portability])
 AC_CONFIG_MACRO_DIR([m4])
 
 GNOME_COMMON_INIT
-GNOME_DOC_INIT
+dnl GNOME_DOC_INIT
 
 AC_LANG_CPLUSPLUS
 
@@ -37,7 +37,6 @@ PKG_CHECK_MODULES(DEPS, [
 dnl TODO: make dbus-glib and tracker optional
 dnl			dbus-glib-1 >= 0.74
 dnl			tracker >= 0.6.3
-			gconfmm-2.6 >= 2.12.0
 			poppler-glib >= 0.16.0
 			libxml-2.0 >= 2.7.6
 			])
