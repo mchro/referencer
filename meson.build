@@ -34,12 +34,14 @@ gtkmm2_dep = dependency('gtkmm-2.4')
 python2_dep = dependency('python2')
 libxml_dep = dependency('libxml-2.0')
 poppler_dep = dependency('poppler-glib')
+bibutils_dep = dependency('bibutils')
 
 deps = [
   gtkmm2_dep,
   python2_dep,
   libxml_dep,
   poppler_dep,
+  bibutils_dep,
 ]
 
 top_inc = include_directories('./src')
