@@ -601,10 +601,14 @@ DocumentView::DocumentView (
 	/*
 	 * Search box
 	 */
+	/*
 	Sexy::IconEntry *searchentry = Gtk::manage (new Sexy::IconEntry ());
 	Gtk::Image *searchicon = Gtk::manage (
 		new Gtk::Image (Gtk::Stock::FIND, Gtk::ICON_SIZE_BUTTON));
 	searchentry->set_icon (Sexy::ICON_ENTRY_PRIMARY, searchicon);
+	*/
+
+	Gtk::Entry *searchentry = new Gtk::Entry();
 	searchentry->signal_changed ().connect (
 		sigc::mem_fun (*this, &DocumentView::onSearchChanged));
 	
@@ -1390,21 +1394,21 @@ void DocumentView::onSearchChanged ()
 	Gdk::Color yellowish ("#f7f7be");
 	Gdk::Color black ("#000000");
 	
-	bool hasclearbutton =
-		((Sexy::IconEntry*) searchentry_)->get_icon (Sexy::ICON_ENTRY_SECONDARY);
+	//bool hasclearbutton =
+	//	((Sexy::IconEntry*) searchentry_)->get_icon (Sexy::ICON_ENTRY_SECONDARY);
 	
 	if (!searchentry_->get_text ().empty()) {
 	/*if (entry->priv->is_a11y_theme)
 		return;*/
 		searchentry_->modify_base (Gtk::STATE_NORMAL, yellowish);
 		searchentry_->modify_text (Gtk::STATE_NORMAL, black);
-		if (!hasclearbutton)
-			((Sexy::IconEntry*) searchentry_)->add_clear_button ();
+		//if (!hasclearbutton)
+		//	((Sexy::IconEntry*) searchentry_)->add_clear_button ();
 	} else {
 		searchentry_->unset_base (Gtk::STATE_NORMAL);
 		searchentry_->unset_text (Gtk::STATE_NORMAL);
-		if (hasclearbutton)
-			((Sexy::IconEntry*) searchentry_)->set_icon (Sexy::ICON_ENTRY_SECONDARY, NULL);
+		//if (hasclearbutton)
+		//	((Sexy::IconEntry*) searchentry_)->set_icon (Sexy::ICON_ENTRY_SECONDARY, NULL);
 	}
 	
 	updateVisible ();
