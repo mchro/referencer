@@ -341,6 +341,7 @@ void Preferences::onProxyChanged ()
 
 Glib::ustring Preferences::getLibraryFilename ()
 {
+	return "";
 	//return confclient_->get_string (libraryfilename_.get_key());
 }
 
@@ -454,15 +455,15 @@ void Preferences::setCrossRefPassword (Glib::ustring const &password)
 
 std::pair<int, int> Preferences::getWindowSize ()
 {
-//	std::pair<int, int> size;
+	std::pair<int, int> size;
 //	size.first = confclient_->get_int (width_.get_key ());
 //	size.second = confclient_->get_int (height_.get_key ());
 //	// Cope with upgrading
 //	if (size.first == 0 || size.second == 0) {
-//		size.first = 700;
-//		size.second = 500;
+		size.first = 700;
+		size.second = 500;
 //	}
-//	return size;
+	return size;
 }
 
 int Preferences::getNotesPaneHeight ()
