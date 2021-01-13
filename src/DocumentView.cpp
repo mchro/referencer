@@ -369,23 +369,23 @@ void DocumentView::doEditTagsDialog(Document *doc) {
 	vbox->set_border_width (12);
 
 	if (dialog.run () == Gtk::RESPONSE_ACCEPT) {
-		/* mangle tags back to tag uid's*/
-		doc->clearTags();
-		std::vector<Glib::ustring> new_tags = Glib::Util::split(entry.get_text(), ",");
+		///* mangle tags back to tag uid's*/
+		//doc->clearTags();
+		//std::vector<Glib::ustring> new_tags = Glib::Util::split(entry.get_text(), ",");
 
-		std::vector<Glib::ustring>::iterator new_tagIter = new_tags.begin();
-		std::vector<Glib::ustring>::iterator const new_tagEnd = new_tags.end();
-		for (; new_tagIter != new_tagEnd; ++new_tagIter) {
-			Glib::Util::trim(*new_tagIter);
-			if (*new_tagIter != "") {
-				int taguid = taglist->getTagUid(*new_tagIter);
-				if (taguid > 0) {
-					doc->setTag(taguid);
-				} else {
-					/* XXX: Tag not found. Ask user to add? */
-				}
-			}
-		}
+		//std::vector<Glib::ustring>::iterator new_tagIter = new_tags.begin();
+		//std::vector<Glib::ustring>::iterator const new_tagEnd = new_tags.end();
+		//for (; new_tagIter != new_tagEnd; ++new_tagIter) {
+		//	Glib::Util::trim(*new_tagIter);
+		//	if (*new_tagIter != "") {
+		//		int taguid = taglist->getTagUid(*new_tagIter);
+		//		if (taguid > 0) {
+		//			doc->setTag(taguid);
+		//		} else {
+		//			/* XXX: Tag not found. Ask user to add? */
+		//		}
+		//	}
+		//}
 
 
 	}
