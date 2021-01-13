@@ -34,6 +34,7 @@ gtkmm2_dep = dependency('gtkmm-2.4')
 python2_dep = dependency('python2')
 libxml_dep = dependency('libxml-2.0')
 poppler_dep = dependency('poppler-glib')
+boost_regex_dep = dependency('boost', modules: ['regex'])
 bibutils_dep = dependency('bibutils')
 
 deps = [
@@ -41,6 +42,7 @@ deps = [
   python2_dep,
   libxml_dep,
   poppler_dep,
+  boost_regex_dep,
   bibutils_dep,
 ]
 
