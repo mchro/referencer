@@ -31,8 +31,10 @@ Preferences *_global_prefs;
 
 Preferences::Preferences ()
 {
+	m_settings = Gio::Settings::create("apps.referencer");
 //	confclient_ = Gnome::Conf::Client::get_default_client ();
 //
+
 //	libraryfilename_ = confclient_->get_entry (CONF_PATH "/libraryfilename");
 //	workoffline_ = confclient_->get_entry (CONF_PATH "/workoffline");
 //	uselistview_ = confclient_->get_entry (CONF_PATH "/uselistview");
@@ -341,14 +343,13 @@ void Preferences::onProxyChanged ()
 
 Glib::ustring Preferences::getLibraryFilename ()
 {
-	return "";
-	//return confclient_->get_string (libraryfilename_.get_key());
+	return m_settings->get_string("libraryfilename");
 }
 
 
 void Preferences::setLibraryFilename (Glib::ustring const &filename)
 {
-	//return confclient_->set (libraryfilename_.get_key(), filename);
+	m_settings->set_string("libraryfilename", filename);
 }
 
 

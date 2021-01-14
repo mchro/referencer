@@ -132,6 +132,7 @@ private:
 	bool ignoreChanges_;
 
 	//Glib::RefPtr<Gnome::Conf::Client> confclient_;
+	Glib::RefPtr<Gio::Settings> m_settings;
 
 	// Set when our gconf directory didn't exist, the first time the
 	// program is run

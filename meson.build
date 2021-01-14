@@ -20,6 +20,12 @@ referencer_localedir = join_paths(referencer_prefix, get_option('localedir'))
 referencer_mandir = join_paths(referencer_prefix, get_option('mandir')) 
 
 
+gnome = import('gnome')
+gnome.compile_schemas(
+  build_by_default: true,
+  depend_files: files('apps.referencer.gschema.xml')
+)
+
 config_h = configuration_data()
 # package
 config_h.set_quoted('PACKAGE_VERSION', referencer_version)

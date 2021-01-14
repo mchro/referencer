@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/apps/referencer/" id="apps.referencer">
+    <key name="libraryfilename" type="s">
+      <default>''</default>
+      <summary>Library filename</summary>
+      <description>The library filename last opened.</description>
+    </key>
+  </schema>
+</schemalist>
