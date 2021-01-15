@@ -87,7 +87,6 @@ class DocumentView : public Gtk::VBox
 	Gtk::Entry *searchentry_;
 	void onSearchChanged ();
 	friend void end_search (GPtrArray * out_array, GError * error, gpointer user_data);
-	std::list<Glib::ustring> trackerUris_;
 
 	/* Signal that we fire whenever selection changes in one of our views */
 	sigc::signal<void> selectionchangedsignal_;

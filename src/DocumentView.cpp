@@ -33,11 +33,6 @@
 
 #include "DocumentView.h"
 
-#undef USE_TRACKER
-#ifdef USE_TRACKER
-#include "tracker.h"
-#endif
-
 static const Glib::ustring defaultSortColumn = "title";
 
 class DocumentCellRenderer : public Gtk::CellRendererPixbuf
@@ -1183,7 +1178,7 @@ bool DocumentView::isVisible (Document * const doc)
  * This needs to be called:
  *  - when global conditions for visibility
  *     change: when the tag filter is changed, when search text is 
- *     changed, or when tracker returns some matches
+ *     changed
  *
  *  Things like adding and updating docs don't need to call this as well
  *
@@ -1351,44 +1346,6 @@ void DocumentView::clear ()
 }
 
 
-void
-end_search (GPtrArray * out_array,
-        GError * error,
-        gpointer user_data)
-{
-	DocumentView *docview = (DocumentView*) user_data;
-	
-	printf (">>end_search\n");
-	
-	docview->trackerUris_.clear ();
-	
-	
-	
-	if (error) {
-		printf ("Tracker error\n");
-		g_error_free (error);
-		// TODO Call the update visibility function
-		return;
-	}
-	
-	if (out_array) {
-		printf ("%d results\n", out_array->len);
-		for (unsigned int i = 0; i < out_array->len; ++i) {
-			char **meta = (char**) g_ptr_array_index (out_array, i);
-			printf ("0x%x : %s\n", meta[0], meta[0]);
-			docview->trackerUris_.push_back (meta[0]);
-		}
-		g_ptr_array_free (out_array, TRUE);
-	}
-	
-	/*
-	 * We're probably calling this twice: we already called it in 
-	 * onSearchChanged
-	 */
-	docview->updateVisible ();
-}
-
-
 void DocumentView::onSearchChanged ()
 {
 	Gdk::Color yellowish ("#f7f7be");
@@ -1412,32 +1369,6 @@ void DocumentView::onSearchChanged ()
 	}
 	
 	updateVisible ();
-	
-	
-	/*
-	 * Get some tracker results and spit them to the console
-	 */
-#ifdef USE_TRACKER
-	TrackerClient *client = tracker_connect (0);
-	if (!client) {
-		printf ("Error in tracker_connect\n");
-		return;
-	}
-	
-	Glib::ustring searchtext = searchentry_->get_text();
-	
-	if (! searchtext.empty()) {
-		tracker_search_text_detailed_async (client,
-	                -1,
-	                SERVICE_FILES,
-	                searchtext.c_str(),
-	                0, 10,
-	                (TrackerGPtrArrayReply)end_search,
-	                this);
-        }
-#endif
-
-	
 }
 
 
