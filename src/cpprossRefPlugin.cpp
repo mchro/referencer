@@ -230,7 +230,7 @@ bool CrossRefPlugin::resolve (Document &doc)
 	Glib::ustring const password = _global_prefs->getCrossRefPassword ();
 
 	Glib::ustring const url = 
-		  Glib::ustring("http://www.crossref.org/openurl/?pid=")
+		  Glib::ustring("http://doi.crossref.org/openurl/?pid=")
 		+ username
 		+ (password.empty() ? "" : ":")
 		+ password 
