@@ -1197,15 +1197,17 @@ void DocumentView::updateVisible ()
 	if (uselistview_) {
 		Gtk::TreeSelection::ListHandle_Path paths =
 			docslistselection_->get_selected_rows ();
-		if (paths.size () > 0)
+		if (paths.size () > 0) {
 			selpath = (*paths.begin());
-		docslistview_->scroll_to_row (selpath);
+			docslistview_->scroll_to_row (selpath);
+		}
 	} else {
 		Gtk::IconView::ArrayHandle_TreePaths paths =
 			docsiconview_->get_selected_items ();
-		if (paths.size () > 0)
+		if (paths.size () > 0) {
 			selpath = (*paths.begin());
-		docsiconview_->scroll_to_path (selpath, true, 0.5, 0.0);
+			docsiconview_->scroll_to_path (selpath, true, 0.5, 0.0);
+		}
 	}
 
 	docSelectionChanged ();
@@ -1260,25 +1262,27 @@ void DocumentView::removeDoc (Document * const doc)
 /*
  * Append a row to docstore_ and load data from Document
  */
-void DocumentView::addDoc (Document * doc)
+void DocumentView::addDoc (Document * doc, bool userTriggered)
 {
 	doc->setView(this);
 
 	Gtk::TreeModel::iterator item = docstore_->append();
 	loadRow (item, doc);
   
-	Gtk::TreeModel::Path path = 
-		docstoresort_->get_path (
-			docstoresort_->convert_child_iter_to_iter (
-				docstorefilter_->convert_child_iter_to_iter (item)));
+	if (userTriggered) {
+		Gtk::TreeModel::Path path =
+			docstoresort_->get_path (
+				docstoresort_->convert_child_iter_to_iter (
+					docstorefilter_->convert_child_iter_to_iter (item)));
 
-	docslistview_->scroll_to_row (path);
-	docslistselection_->unselect_all ();
-	docslistselection_->select (path);
+		docslistview_->scroll_to_row (path);
+		docslistselection_->unselect_all ();
+		docslistselection_->select (path);
 
-	docsiconview_->unselect_all ();
-	docsiconview_->scroll_to_path (path, false, 0.0, 0.0);
-	docsiconview_->select_path (path);
+		docsiconview_->unselect_all ();
+		docsiconview_->scroll_to_path (path, false, 0.0, 0.0);
+		docsiconview_->select_path (path);
+	}
 }
 
 
@@ -1318,7 +1322,7 @@ void DocumentView::populateDocStore ()
 	DocumentList::Container::iterator docit = docvec.begin();
 	DocumentList::Container::iterator const docend = docvec.end();
 	for (; docit != docend; ++docit) {
-		addDoc (&(*docit));
+		addDoc (&(*docit), false);
 	}
 
 	// Restore initial selection

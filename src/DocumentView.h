@@ -29,7 +29,7 @@ class DocumentView : public Gtk::VBox
 	void updateAllDocs ();
 	void updateDoc (Document * const doc);
 	void removeDoc (Document * const doc);
-	void addDoc (Document * doc);
+	void addDoc (Document * doc, bool userTriggered = true);
 	void updateVisible ();
 	void clear ();
 
