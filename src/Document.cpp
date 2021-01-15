@@ -546,7 +546,6 @@ bool Document::readPDF ()
 
 	Glib::ustring textdump;
 	int num_pages = poppler_document_get_n_pages (popplerdoc);
-	bool got_id = false;
 
 	if (num_pages == 0) {
 		DEBUG ("Document::readPDF: No pages in '%1'", filename_);
@@ -564,15 +563,11 @@ bool Document::readPDF ()
 	bib_.guessDoi (textdump);
 	bib_.guessArxiv (textdump);
 
-	if (!bib_.getDoi ().empty () || !bib_.getExtras ()["eprint"].empty ()) {
-		got_id = true;
-	}
-
 	//Try to extract PDF metadata
 	char *pdfauthor_c = poppler_document_get_author(popplerdoc);
 	if (pdfauthor_c) {
 		Glib::ustring pdfauthor = pdfauthor_c;
-		if (pdfauthor != "" && pdfauthor.find(" ") != -1) {
+		if (pdfauthor != "" && pdfauthor.find(" ") != Glib::ustring::npos) {
 			//If author contains more than one word, it might be sensible
 			//Some bad examples: "Author", "jol", "IEEE",
 			//"U-STAR\bgogul,S-1-5-21-2879401181-1713613690-3240760954-1005"
@@ -585,7 +580,7 @@ bool Document::readPDF ()
 	char *pdftitle_c = poppler_document_get_title(popplerdoc);
 	if (pdftitle_c) {
 		Glib::ustring pdftitle = pdftitle_c;
-		if (pdftitle != "" && pdftitle.find(" ") != -1) {
+		if (pdftitle != "" && pdftitle.find(" ") != Glib::ustring::npos) {
 			//If title contains more than one word, it might be sensible
 			//Some bad examples: "Title", "ssl-attacks.dvi",
 			//"doi:10.1016/j.scico.2005.02.009", "MAIN", "24690003",
@@ -606,7 +601,6 @@ bool Document::readPDF ()
 
 bool Document::canGetMetadata ()
 {
-	PluginManager *pluginManager = _global_plugins;
 	return _global_plugins->canResolve(*this);
 }
 
@@ -693,7 +687,6 @@ bool Document::getMetaData ()
 	if (_global_prefs->getWorkOffline())
 		return false;
 
-	PluginManager *pluginManager = _global_plugins;
 	bool success = false;
 
 	success = _global_plugins->resolveMetadata(*this);
@@ -907,7 +900,7 @@ bool Document::parseBibtex (Glib::ustring const &bibtex)
 		
 		BibUtils::bibl_free( &b );
 		return true;
-	} catch (Glib::Error ex) {
+	} catch (Glib::Error& ex) {
 		BibUtils::bibl_free( &b );
 		Utility::exceptionDialog (&ex, _("Parsing BibTeX"));
 	}

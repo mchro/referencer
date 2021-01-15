@@ -20,9 +20,6 @@
 
 #include "Plugin.h"
 
-class Gtk::TreePath;
-class Glib::ustring;
-
 class Document;
 class DocumentList;
 class DocumentProperties;

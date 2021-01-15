@@ -214,8 +214,8 @@ void PythonPlugin::load (std::string const &moduleName)
 
 int PythonPlugin::canResolve (Document &doc)
 {
-    if (pCanResolveFunc_ == NULL)
-        return -1;
+	if (pCanResolveFunc_ == NULL)
+		return -1;
 
 	referencer_document *pDoc =
 		PyObject_New (referencer_document, &t_referencer_document);
@@ -230,7 +230,7 @@ int PythonPlugin::canResolve (Document &doc)
 
     int toret = -1;
 	if (pReturn != NULL) {
-        toret = PyLong_AsLong(pReturn);
+		toret = PyLong_AsLong(pReturn);
 		Py_DECREF(pReturn);
 	} else {
 		DEBUG ("PythonPlugin::resolveID: NULL return from PyObject_CallObject");

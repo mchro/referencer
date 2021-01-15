@@ -201,7 +201,7 @@ struct LibraryData {
      * @exception Glib::Exception this exception is thrown if the parsing fails
      * for any reason.
      */
-    void extractData(xmlDocPtr libDocument) throw (Glib::Exception);
+    void extractData(xmlDocPtr libDocument);
 };
 
 class Library {
@@ -214,7 +214,7 @@ class Library {
 	bool save (Glib::ustring const &libfilename);
 
 	void writeXML(xmlTextWriterPtr writer);
-	bool readXML(Gio::InputStream *inputStream) throw(Glib::Exception);
+	bool readXML(Gio::InputStream *inputStream);
 
 	void writeBibtex (
 		Glib::ustring const &bibfilename,
@@ -271,7 +271,7 @@ class Library {
      * @returns 'true' if the library data has been read successfully,
      * otherwise it returns 'false'.
      */
-    bool readLibrary(xmlDocPtr libDocument) throw (Glib::Exception);
+    bool readLibrary(xmlDocPtr libDocument);
 
 private:
     /**

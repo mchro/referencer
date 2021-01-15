@@ -341,7 +341,6 @@ Document parseBibUtils (BibUtils::fields *ref)
 				key = Utility::firstCap (key);
 			}
 
-			int level = ref->level[j];
 			if (!value.empty ()) {
 				newdoc.getBibData().addExtra (key, value);
 			}
@@ -408,7 +407,8 @@ void biblFromString (
 	while (!advance) {}
 
 	FILE *otherend = fdopen (pipeout, "r");
-	BibUtils::bibl_read(&b, otherend, "My Pipe", format, &p );
+	std::string strfakefilename = "My Pipe";
+	BibUtils::bibl_read(&b, otherend, &strfakefilename[0], format, &p );
 	fclose (otherend);
 	close (pipeout);
 

@@ -65,7 +65,7 @@ bool ArxivPlugin::resolve (Document &doc)
 			_("Downloading Metadata"), messagetext, filename);
 
 		DEBUG ("Raw citebase:\n%1\n----", *rawtext);
-	} catch (Transfer::Exception ex) {
+	} catch (Transfer::Exception& ex) {
 		Utility::exceptionDialog (&ex, _("Downloading metadata"));
 		return false;
 	}
@@ -102,7 +102,7 @@ bool ArxivPlugin::resolve (Document &doc)
 		doc.getBibData().mergeIn (newdoc.getBibData());	
 		
 		BibUtils::bibl_free( &b );
-	} catch (Glib::Error ex) {
+	} catch (Glib::Error& ex) {
 		BibUtils::bibl_free( &b );
 		Utility::exceptionDialog (&ex, _("Parsing BibTeX"));
 		return false;

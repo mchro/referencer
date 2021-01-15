@@ -159,7 +159,7 @@ protected:
         Glib::RefPtr<Gdk::GC> gc = Gdk::GC::create (window);
         
 
-        if (flags & (Gtk::CELL_RENDERER_SELECTED|Gtk::CELL_RENDERER_PRELIT) != 0) {
+        if ((flags & (Gtk::CELL_RENDERER_SELECTED|Gtk::CELL_RENDERER_PRELIT)) != 0) {
             Gtk::StateType state;
 
             if ((flags & Gtk::CELL_RENDERER_SELECTED) != 0) {
@@ -274,8 +274,6 @@ protected:
 		docview_->docActivate (doc);
 		
 		return true;
-	} else {
-		GdkEventType type = event->type;
 	}
 
         Glib::RefPtr<Gdk::Pixbuf> thumb = doc->getThumbnail ();
@@ -718,7 +716,7 @@ void DocumentView::onIconsDragData (
 			Glib::RefPtr<Gio::FileInfo> info;
 			try {
 				info = uri->query_info ();
-			} catch (const Gio::Error ex) {
+			} catch (const Gio::Error& ex) {
 				Utility::exceptionDialog (&ex,
 					String::ucompose (
 						_("Getting info for file '%1'"),
@@ -1479,7 +1477,7 @@ void DocumentView::addColumn (
 	win_.actiongroup_->add(action.action);
 	try {
 		action.merge = win_.uimanager_->add_ui_from_string (ui);
-	} catch (Glib::Error err) {
+	} catch (Glib::Error& err) {
 		DEBUG (ui);
 		DEBUG ("Merge error: %1", err.what());
 	}

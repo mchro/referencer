@@ -125,7 +125,7 @@ void RefWindow::constructUI ()
 		Glib::RefPtr<Gdk::Pixbuf> icon = Gdk::Pixbuf::create_from_file(
 			Utility::findDataFile("referencer.svg"));
 		window_->set_icon (icon);
-	} catch (Gdk::PixbufError ex) {
+	} catch (Gdk::PixbufError& ex) {
 	}
 
 	/* Vbox fills the whole window */
@@ -606,7 +606,6 @@ void RefWindow::updateTagSizes ()
 
 	/* What was I smoking when I wrote TagList?  Mung it into a more
 	 * useful data structure. */
-	typedef std::map<Glib::ustring, std::pair<int, int> > SensibleMap;
 	std::map<Glib::ustring, std::pair<int, int> > sensibleTags;
 	TagList::TagMap allTags = library_->getTagList()->getTags();
 	TagList::TagMap::iterator sensibleIter = allTags.begin();
@@ -1424,9 +1423,6 @@ void RefWindow::onNotesExport ()
 			linkers.push_back(&url);
 			linkers.push_back(&pubmed);
 			linkers.push_back(&google);
-
-			std::vector<Linker*>::iterator it = linkers.begin ();
-			std::vector<Linker*>::iterator const end = linkers.end ();
 		}
 		/* }}} */
 		
@@ -2391,7 +2387,6 @@ void RefWindow::onGetMetadataDoc ()
 {
 	progress_->start (_("Fetching metadata"));
 
-	bool doclistdirty = false;
 	std::vector <Document*> docs = docview_->getSelectedDocs ();
 	std::vector <Document*>::iterator it = docs.begin ();
 	std::vector <Document*>::iterator const end = docs.end ();
@@ -2399,7 +2394,6 @@ void RefWindow::onGetMetadataDoc ()
 		Document* doc = *it;
 		if (doc->canGetMetadata ()) {
 			setDirty (true);
-			doclistdirty = true;
 			doc->getMetaData ();
 			docview_->updateDoc(doc);
 		}
