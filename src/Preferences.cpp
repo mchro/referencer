@@ -446,5 +446,11 @@ void Preferences::setPluginPref (Glib::ustring const &key, Glib::ustring const &
  */
 Glib::ustring Preferences::getPluginPref (Glib::ustring const &key)
 {
-	return m_settings->get_string("plugin-" + key);
+	std::vector<Glib::ustring> allkeys = m_settings->list_keys();
+
+	auto foundkey = std::find(std::begin(allkeys), std::end(allkeys), key);
+	if (foundkey != std::end(allkeys))
+		return m_settings->get_string("plugin-" + key);
+	else
+		return "";
 }
