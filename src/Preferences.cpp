@@ -21,14 +21,6 @@ Preferences *_global_prefs;
 
 #define CONF_PATH "/apps/referencer"
 
-#define USE_PROXY_KEY   "/system/http_proxy/use_http_proxy"
-#define HTTP_PROXY_HOST_KEY  "/system/http_proxy/host"
-#define HTTP_PROXY_PORT_KEY  "/system/http_proxy/port"
-#define HTTP_USE_AUTH_KEY    "/system/http_proxy/use_authentication"
-#define HTTP_AUTH_USER_KEY   "/system/http_proxy/authentication_user"
-#define HTTP_AUTH_PASSWD_KEY "/system/http_proxy/authentication_password"
-#define PROXY_MODE_KEY "/system/proxy/mode"
-
 Preferences::Preferences ()
 {
 	m_settings = Gio::Settings::create("apps.referencer");
@@ -45,15 +37,6 @@ Preferences::Preferences ()
 //	width_ = confclient_->get_entry (CONF_PATH "/width");
 //	height_ = confclient_->get_entry (CONF_PATH "/height");
 //	notesheight_ = confclient_->get_entry (CONF_PATH "/notesheight");
-//
-//	proxymode_ = confclient_->get_entry (PROXY_MODE_KEY);
-//	proxyuseproxy_ = confclient_->get_entry (USE_PROXY_KEY);
-//	proxyuseauth_ = confclient_->get_entry (HTTP_USE_AUTH_KEY);
-//	proxyhost_ = confclient_->get_entry (HTTP_PROXY_HOST_KEY);
-//	proxyport_ = confclient_->get_entry (HTTP_PROXY_PORT_KEY);
-//	proxyusername_ = confclient_->get_entry (HTTP_AUTH_USER_KEY);
-//	proxypassword_ = confclient_->get_entry (HTTP_AUTH_PASSWD_KEY);
-//
 //
 //	/*
 //	 * List view options
@@ -82,21 +65,9 @@ Preferences::Preferences ()
 //	confclient_->add_dir (
 //		CONF_PATH,
 //		Gnome::Conf::CLIENT_PRELOAD_NONE);
-//	confclient_->add_dir (
-//		"/system/http_proxy",
-//		Gnome::Conf::CLIENT_PRELOAD_NONE);
-//	confclient_->add_dir (
-//		"/system/proxy",
-//		Gnome::Conf::CLIENT_PRELOAD_NONE);
 //
 //	confclient_->notify_add (
 //		CONF_PATH,
-//		sigc::mem_fun (*this, &Preferences::onConfChange));
-//	confclient_->notify_add (
-//		"/system/http_proxy",
-//		sigc::mem_fun (*this, &Preferences::onConfChange));
-//	confclient_->notify_add (
-//		"/system/proxy",
 //		sigc::mem_fun (*this, &Preferences::onConfChange));
 
 	xml_ = Gtk::Builder::create_from_file 
@@ -104,26 +75,6 @@ Preferences::Preferences ()
 
 
 	xml_->get_widget ("Preferences", dialog_);
-
-	xml_->get_widget ("ProxyHost", proxyhostentry_);
-	xml_->get_widget ("ProxyPort", proxyportspin_);
-	xml_->get_widget ("ProxyUsername", proxyusernameentry_);
-	xml_->get_widget ("ProxyPassword", proxypasswordentry_);
-	xml_->get_widget ("UseWebProxy", useproxycheck_);
-	xml_->get_widget ("UseAuthentication", useauthcheck_);
-
-	proxyhostentry_->signal_changed().connect (
-		sigc::mem_fun (*this, &Preferences::onProxyChanged));
-	proxyportspin_->signal_value_changed().connect (
-		sigc::mem_fun (*this, &Preferences::onProxyChanged));
-	proxyusernameentry_->signal_changed().connect (
-		sigc::mem_fun (*this, &Preferences::onProxyChanged));
-	proxypasswordentry_->signal_changed().connect (
-		sigc::mem_fun (*this, &Preferences::onProxyChanged));
-	useproxycheck_->signal_toggled().connect (
-		sigc::mem_fun (*this, &Preferences::onProxyChanged));
-	useauthcheck_->signal_toggled().connect (
-		sigc::mem_fun (*this, &Preferences::onProxyChanged));
 
 //	/*
 //	 * Plugins
@@ -228,27 +179,6 @@ Preferences::~Preferences ()
 //	} else if (key == CONF_PATH "/shownotespane") {
 //		shownotespanesignal_.emit ();
 //
-//	// Proxy settings
-//	} else if (key == HTTP_PROXY_HOST_KEY) {
-//		proxyhostentry_->set_text (
-//			entry.get_value ().get_string ());
-//	} else if (key == HTTP_PROXY_PORT_KEY) {
-//		proxyportspin_->get_adjustment ()->set_value (
-//			entry.get_value ().get_int ());
-//	} else if (key == HTTP_AUTH_USER_KEY) {
-//		proxyusernameentry_->set_text (
-//			entry.get_value ().get_string ());
-//	} else if (key == HTTP_AUTH_PASSWD_KEY) {
-//		proxypasswordentry_->set_text (
-//			entry.get_value ().get_string ());
-//	} else if (key == PROXY_MODE_KEY || key == USE_PROXY_KEY) {
-//		Glib::ustring const mode = confclient_->get_string (PROXY_MODE_KEY);
-//		useproxycheck_->set_active (
-//			mode != "none" && confclient_->get_bool (USE_PROXY_KEY));
-//		updateSensitivity ();
-//	} else if (key == HTTP_USE_AUTH_KEY) {
-//		useauthcheck_->set_active (entry.get_value ().get_bool ());
-//		updateSensitivity ();
 //	} else if (key == CONF_PATH "/disabledplugins") {
 //		plugindisabledsignal_.emit ();
 //
@@ -268,76 +198,8 @@ Preferences::~Preferences ()
 
 void Preferences::showDialog ()
 {
-	ignoreChanges_ = true;
-
-	/*
-	 * Plugin stuff was populated at construction time
-	 * and should remain in a consistent state thereafter
-	 */
-
-//	proxyhostentry_->set_text (
-//		confclient_->get_string (HTTP_PROXY_HOST_KEY));
-//	proxyportspin_->get_adjustment ()->set_value (
-//		confclient_->get_int (HTTP_PROXY_PORT_KEY));
-//	proxyusernameentry_->set_text (
-//		confclient_->get_string (HTTP_AUTH_USER_KEY));
-//	proxypasswordentry_->set_text (
-//		confclient_->get_string (HTTP_AUTH_PASSWD_KEY));
-//	Glib::ustring const mode = confclient_->get_string (PROXY_MODE_KEY);
-//	useproxycheck_->set_active (
-//		mode != "none" && confclient_->get_bool (USE_PROXY_KEY));
-//	useauthcheck_->set_active (confclient_->get_bool (HTTP_USE_AUTH_KEY));
-
-	ignoreChanges_ = false;
-
-	updateSensitivity ();
-
 	dialog_->run ();
 	dialog_->hide ();
-}
-
-
-void Preferences::updateSensitivity ()
-{
-	bool useproxy = useproxycheck_->get_active ();
-	proxyhostentry_->set_sensitive (useproxy);
-	proxyportspin_->set_sensitive (useproxy);
-	useauthcheck_->set_sensitive (useproxy);
-
-	bool useauth = useauthcheck_->get_active ();
-	proxyusernameentry_->set_sensitive (useproxy && useauth);
-	proxypasswordentry_->set_sensitive (useproxy && useauth);
-}
-
-
-void Preferences::onProxyChanged ()
-{
-	if (ignoreChanges_) return;
-
-	bool useproxy = useproxycheck_->get_active ();
-	bool useauth = useauthcheck_->get_active ();
-
-//	confclient_->set (proxyuseproxy_.get_key (), useproxy);
-//	if (useproxy) {
-//		confclient_->set (proxymode_.get_key (), Glib::ustring ("manual"));
-//		confclient_->set (
-//			proxyhost_.get_key(), proxyhostentry_->get_text ());
-//		confclient_->set (
-//			proxyport_.get_key(),
-//			(int) proxyportspin_->get_adjustment ()->get_value ());
-//	} else {
-//		confclient_->set (proxymode_.get_key (), Glib::ustring ("none"));
-//	}
-//
-//	confclient_->set (proxyuseauth_.get_key(), useauth);
-//	if (useproxy && useauth) {
-//		confclient_->set (
-//			proxyusername_.get_key(), proxyusernameentry_->get_text ());
-//		confclient_->set (
-//			proxypassword_.get_key(), proxypasswordentry_->get_text ());
-//	}
-
-	updateSensitivity ();
 }
 
 
