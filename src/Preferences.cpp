@@ -20,6 +20,8 @@
 Preferences *_global_prefs;
 
 #define CONF_PATH "/apps/referencer"
+#define LIST_VIEW "list"
+#define ICON_VIEW "icon"
 
 Preferences::Preferences ()
 {
@@ -66,9 +68,7 @@ Preferences::Preferences ()
 //		CONF_PATH,
 //		Gnome::Conf::CLIENT_PRELOAD_NONE);
 //
-//	confclient_->notify_add (
-//		CONF_PATH,
-//		sigc::mem_fun (*this, &Preferences::onConfChange));
+	m_settings->signal_changed().connect(sigc::mem_fun(*this, &Preferences::onSettingsChange));
 
 	xml_ = Gtk::Builder::create_from_file 
 			(Utility::findDataFile ("preferences.ui"));
@@ -163,6 +163,36 @@ Preferences::~Preferences ()
 
 }
 
+void Preferences::onSettingsChange (const Glib::ustring& key)
+{
+	ignoreChanges_ = true;
+
+	// Settings not in dialog
+	if (key == "work-offline") {
+		workofflinesignal_.emit ();
+	} else if (key == "view-type") {
+		uselistviewsignal_.emit ();
+	} else if (key == "show-tag-pane") {
+		showtagpanesignal_.emit ();
+	} else if (key == "show-notes-pane") {
+		shownotespanesignal_.emit ();
+	} else if (
+	    /* keys to ignore */
+	    key == "window-width"
+	    || key == "window-size"
+	    || key == "notes-pane-height"
+	    || key == "library-filename"
+	    || key == "crossref-username"
+	    || key == "crossref-password"
+	    || key == "list-sort"
+	    ) {
+		;
+	} else {
+		DEBUG (String::ucompose("unhandled key %1", key));
+	}
+
+	ignoreChanges_ = false;
+}
 
 //void Preferences::onConfChange (int number, Gnome::Conf::Entry entry)
 //{
@@ -205,25 +235,25 @@ void Preferences::showDialog ()
 
 Glib::ustring Preferences::getLibraryFilename ()
 {
-	return m_settings->get_string("libraryfilename");
+	return m_settings->get_string("library-filename");
 }
 
 
 void Preferences::setLibraryFilename (Glib::ustring const &filename)
 {
-	m_settings->set_string("libraryfilename", filename);
+	m_settings->set_string("library-filename", filename);
 }
 
 
 bool Preferences::getWorkOffline ()
 {
-	//return confclient_->get_bool (workoffline_.get_key());
+	return m_settings->get_boolean("work-offline");
 }
 
 
 void Preferences::setWorkOffline (bool const &offline)
 {
-	//confclient_->set (workoffline_.get_key(), offline);
+	m_settings->set_boolean("work-offline", offline);
 }
 
 
@@ -240,13 +270,13 @@ sigc::signal<void>& Preferences::getPluginDisabledSignal ()
 
 bool Preferences::getUseListView ()
 {
-	//return confclient_->get_bool (uselistview_.get_key());
+	return m_settings->get_string("view-type") == LIST_VIEW;
 }
 
 
 void Preferences::setUseListView (bool const &uselistview)
 {
-	//confclient_->set (uselistview_.get_key(), uselistview);
+	m_settings->set_string("view-type", uselistview ? LIST_VIEW : ICON_VIEW);
 }
 
 
@@ -258,13 +288,13 @@ sigc::signal<void>& Preferences::getUseListViewSignal ()
 
 bool Preferences::getShowTagPane ()
 {
-	//return confclient_->get_bool (showtagpane_.get_key());
+	return m_settings->get_boolean("show-tag-pane");
 }
 
 
 void Preferences::setShowTagPane (bool const &showtagpane)
 {
-	//confclient_->set (showtagpane_.get_key(), showtagpane);
+	m_settings->set_boolean("show-tag-pane", showtagpane);
 }
 
 
@@ -275,13 +305,13 @@ sigc::signal<void>& Preferences::getShowTagPaneSignal ()
 
 bool Preferences::getShowNotesPane ()
 {
-	//return confclient_->get_bool (shownotespane_.get_key());
+	return m_settings->get_boolean("show-notes-pane");
 }
 
 
 void Preferences::setShowNotesPane (bool const &shownotespane)
 {
-	//confclient_->set (shownotespane_.get_key(), shownotespane);
+	m_settings->set_boolean("show-notes-pane", shownotespane);
 }
 
 
@@ -294,86 +324,70 @@ sigc::signal<void>& Preferences::getShowNotesPaneSignal ()
 
 Glib::ustring Preferences::getCrossRefUsername ()
 {
-	//return confclient_->get_string (crossRefUsername_.get_key());
+	return m_settings->get_string("crossref-username");
 }
 
 
 Glib::ustring Preferences::getCrossRefPassword ()
 {
-	//return confclient_->get_string (crossRefPassword_.get_key());
+	return m_settings->get_string("crossref-password");
 }
 
 
 void Preferences::setCrossRefUsername (Glib::ustring const &username)
 {
-	//confclient_->set (crossRefUsername_.get_key(), username);
+	m_settings->set_string("crossref-username", username);
 }
 
 
 void Preferences::setCrossRefPassword (Glib::ustring const &password)
 {
-	//confclient_->set (crossRefPassword_.get_key(), password);
+	m_settings->set_string("crossref-password", password);
 }
 
 
 std::pair<int, int> Preferences::getWindowSize ()
 {
-	std::pair<int, int> size;
-//	size.first = confclient_->get_int (width_.get_key ());
-//	size.second = confclient_->get_int (height_.get_key ());
-//	// Cope with upgrading
-//	if (size.first == 0 || size.second == 0) {
-		size.first = 700;
-		size.second = 500;
-//	}
-	return size;
-}
+	auto value = Glib::Variant<std::tuple<int, int>>();
+	m_settings->get_value("window-size", value);
 
-int Preferences::getNotesPaneHeight ()
-{
-//	int height = confclient_->get_int (notesheight_.get_key ());
-//	if (height == 0)
-//		return -1;
-//	else
-//		return height;
-}
-
-void Preferences::setNotesPaneHeight (int height)
-{
-	//confclient_->set (notesheight_.get_key (), height);
+	return std::pair<int, int>(
+			std::get<0>(value.get()),
+			std::get<1>(value.get()));
 }
 
 void Preferences::setWindowSize (std::pair<int, int> size)
 {
-//	confclient_->set (width_.get_key (), size.first);
-//	confclient_->set (height_.get_key (), size.second);
+	Glib::VariantBase value = Glib::Variant<std::tuple<int, int>>::create(size);
+	m_settings->set_value("window-size", value);
 }
 
+int Preferences::getNotesPaneHeight ()
+{
+	return m_settings->get_int("notes-pane-height");
+}
+
+void Preferences::setNotesPaneHeight (int height)
+{
+	m_settings->set_int("notes-pane-height", height);
+}
 
 std::pair<Glib::ustring, int> Preferences::getListSort ()
 {
-	std::pair<Glib::ustring, int> retval;
-//	try {
-//		retval.first = confclient_->get_string (listSortColumn_.get_key());
-//	} catch (Gnome::Conf::Error &err) {
-//		DEBUG ("Got a gconf error '%1', probably a legacy config, defaulting.",
-//			err.what());
-//
-//		DEBUG ("Legacy config, setting no sort column");
-//		retval.first = "";
-//	}
-//	DEBUG ("Got column '%1'", retval.first);
 
-//	retval.second = confclient_->get_int (listSortOrder_.get_key());
+	auto value = Glib::Variant<std::tuple<Glib::ustring, int>>();
+	m_settings->get_value("list-sort", value);
 
-	return retval;
+	return std::pair<Glib::ustring, int>(
+			std::get<0>(value.get()),
+			std::get<1>(value.get()));
 }
-
 
 void Preferences::setListSort (Glib::ustring const &columnName, int const order)
 {
-	//confclient_->set (listSortColumn_.get_key(), columnName);
-	//confclient_->set (listSortOrder_.get_key(), order);
+	auto value = Glib::Variant<std::tuple<Glib::ustring, int>>::create(
+			std::make_tuple(columnName, order));
+	m_settings->set_value("list-sort", value);
 }
 
 

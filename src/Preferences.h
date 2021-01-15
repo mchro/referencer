@@ -105,6 +105,7 @@ private:
 	void updateSensitivity ();
 
 	//void onConfChange (int number, Gnome::Conf::Entry entry);
+	void onSettingsChange (const Glib::ustring& key);
 
 	//Gnome::Conf::Entry workoffline_;
 	//Gnome::Conf::Entry uselistview_;
