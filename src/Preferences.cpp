@@ -26,46 +26,6 @@ Preferences *_global_prefs;
 Preferences::Preferences ()
 {
 	m_settings = Gio::Settings::create("apps.referencer");
-//	confclient_ = Gnome::Conf::Client::get_default_client ();
-//
-
-//	libraryfilename_ = confclient_->get_entry (CONF_PATH "/libraryfilename");
-//	workoffline_ = confclient_->get_entry (CONF_PATH "/workoffline");
-//	uselistview_ = confclient_->get_entry (CONF_PATH "/uselistview");
-//	showtagpane_ = confclient_->get_entry (CONF_PATH "/showtagpane");
-//	shownotespane_ = confclient_->get_entry (CONF_PATH "/shownotespane");
-//	crossRefUsername_ = confclient_->get_entry (CONF_PATH "/crossrefusername");
-//	crossRefPassword_ = confclient_->get_entry (CONF_PATH "/crossrefpassword");
-//	width_ = confclient_->get_entry (CONF_PATH "/width");
-//	height_ = confclient_->get_entry (CONF_PATH "/height");
-//	notesheight_ = confclient_->get_entry (CONF_PATH "/notesheight");
-//
-//	/*
-//	 * List view options
-//	 */
-//	listSortColumn_ = confclient_->get_entry (CONF_PATH "/listsortcolumn");
-//	listSortOrder_ = confclient_->get_entry (CONF_PATH "/listsortorder");
-//
-//
-//	if (!confclient_->dir_exists (CONF_PATH)) {
-//		DEBUG ( "Preferences::Preferences: CONF_PATH "
-//			"doesn't exist, setting it up");
-//
-//		setLibraryFilename ("");
-//		setShowTagPane (true);
-//		setShowNotesPane (true);
-//		setNotesPaneHeight (-1);
-//		setUseListView (false);
-//		setWorkOffline (false);
-//		setWindowSize (std::pair<int,int>(700,500));
-//		setListSort ("title", 0);
-//	} else {
-//	}
-//
-//	confclient_->add_dir (
-//		CONF_PATH,
-//		Gnome::Conf::CLIENT_PRELOAD_NONE);
-//
 	m_settings->signal_changed().connect(sigc::mem_fun(*this, &Preferences::onSettingsChange));
 
 	xml_ = Gtk::Builder::create_from_file 
@@ -458,11 +418,6 @@ void Preferences::onPluginAbout ()
 	if (!plugin->getAuthor().empty()) {
 	    dialog.set_copyright ("Authors: " + plugin->getAuthor());
 	}
-//	dialog.set_website ("http://icculus.org/referencer/");
-/*	dialog.set_logo (
-		Gdk::Pixbuf::create_from_file (
-			Utility::findDataFile ("referencer.svg"),
-			128, 128));*/
 	dialog.run ();
 }
 
