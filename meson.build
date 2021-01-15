@@ -17,7 +17,7 @@ referencer_includedir = join_paths(referencer_prefix, get_option('includedir'))
 referencer_libdir = join_paths(referencer_prefix, get_option('libdir'))
 referencer_libexecdir = join_paths(referencer_prefix, get_option('libexecdir'))
 referencer_localedir = join_paths(referencer_prefix, get_option('localedir'))
-referencer_mandir = join_paths(referencer_prefix, get_option('mandir')) 
+referencer_mandir = join_paths(referencer_prefix, get_option('mandir'))
 
 
 gnome = import('gnome')
@@ -91,6 +91,7 @@ sources = files(
   'src/ThumbnailGenerator.cpp',
   'src/Transfer.cpp',
   'src/Utility.cpp',
+  'src/ustring.cpp',
 )
 
 
