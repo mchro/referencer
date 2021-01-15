@@ -59,9 +59,7 @@ Preferences::Preferences ()
 //		setWorkOffline (false);
 //		setWindowSize (std::pair<int,int>(700,500));
 //		setListSort ("title", 0);
-//		firsttime_ = true;
 //	} else {
-//		firsttime_ = false;
 //	}
 //
 //	confclient_->add_dir (
@@ -76,12 +74,9 @@ Preferences::Preferences ()
 
 	xml_->get_widget ("Preferences", dialog_);
 
-//	/*
-//	 * Plugins
-//	 */
-//	disabledPlugins_ = confclient_->get_entry (CONF_PATH "/disabledplugins");
-//	Gnome::Conf::SListHandle_ValueString disable =
-//		confclient_->get_string_list (disabledPlugins_.get_key ());
+	/*
+	 * Plugins
+	 */
 
 	xml_->get_widget ("PluginConfigure", configureButton_);
 	configureButton_->signal_clicked().connect (
@@ -91,6 +86,7 @@ Preferences::Preferences ()
 		sigc::mem_fun (*this, &Preferences::onPluginAbout));
 
 	
+	auto disabledPlugins = getDisabledPlugins();
 	// Iterate over all plugins
 	std::list<Plugin*> plugins = _global_plugins->getPlugins();
 	std::list<Plugin*>::iterator pit = plugins.begin();
@@ -99,14 +95,14 @@ Preferences::Preferences ()
 		// All enabled unless disabled
 		(*pit)->setEnabled(true);
 
-//		Gnome::Conf::SListHandle_ValueString::iterator dit = disable.begin();
-//		Gnome::Conf::SListHandle_ValueString::iterator const dend = disable.end();
-//		for (; dit != dend; ++dit) {
-//			if ((*pit)->getShortName() == (*dit)) {
-//				(*pit)->setEnabled(false);
-//				DEBUG (String::ucompose ("disabling plugin %1", (*pit)->getShortName()));
-//			}
-//		}
+		auto dit = disabledPlugins.begin();
+		auto const dend = disabledPlugins.end();
+		for (; dit != dend; ++dit) {
+			if ((*pit)->getShortName() == (*dit)) {
+				(*pit)->setEnabled(false);
+				DEBUG (String::ucompose ("disabling plugin %1", (*pit)->getShortName()));
+			}
+		}
 	}
 
 	Gtk::TreeModel::ColumnRecord pluginCols;
@@ -176,6 +172,8 @@ void Preferences::onSettingsChange (const Glib::ustring& key)
 		showtagpanesignal_.emit ();
 	} else if (key == "show-notes-pane") {
 		shownotespanesignal_.emit ();
+	} else if (key == "disabled-plugins") {
+		plugindisabledsignal_.emit ();
 	} else if (
 	    /* keys to ignore */
 	    key == "window-width"
@@ -193,38 +191,6 @@ void Preferences::onSettingsChange (const Glib::ustring& key)
 
 	ignoreChanges_ = false;
 }
-
-//void Preferences::onConfChange (int number, Gnome::Conf::Entry entry)
-//{
-//	ignoreChanges_ = true;
-//	Glib::ustring key = entry.get_key ();
-//
-//	// Settings not in dialog
-//	if (key == CONF_PATH "/workoffline") {
-//		workofflinesignal_.emit ();
-//	} else if (key == CONF_PATH "/uselistview") {
-//		uselistviewsignal_.emit ();
-//	} else if (key == CONF_PATH "/showtagpane") {
-//		showtagpanesignal_.emit ();
-//	} else if (key == CONF_PATH "/shownotespane") {
-//		shownotespanesignal_.emit ();
-//
-//	} else if (key == CONF_PATH "/disabledplugins") {
-//		plugindisabledsignal_.emit ();
-//
-//	/* keys to ignore */
-//	} else if (
-//	    key == CONF_PATH "/width"
-//	    || key == CONF_PATH "/height"
-//		|| key == CONF_PATH "/notesheight") {
-//		;
-//	} else {
-//		DEBUG (String::ucompose("unhandled key %1", key));
-//	}
-//
-//	ignoreChanges_ = false;
-//}
-
 
 void Preferences::showDialog ()
 {
@@ -390,6 +356,17 @@ void Preferences::setListSort (Glib::ustring const &columnName, int const order)
 	m_settings->set_value("list-sort", value);
 }
 
+std::vector<Glib::ustring> Preferences::getDisabledPlugins() {
+	auto disabledPluginsSetting = Glib::Variant<std::vector<Glib::ustring>>();
+	m_settings->get_value("disabled-plugins", disabledPluginsSetting);
+	return disabledPluginsSetting.get();
+}
+
+void Preferences::setDisabledPlugins (std::vector<Glib::ustring> disabledPlugins)
+{
+	auto value = Glib::Variant<std::vector<Glib::ustring>>::create(disabledPlugins);
+	m_settings->set_value("disabled-plugins", value);
+}
 
 void Preferences::onPluginToggled (Glib::ustring const &str)
 {
@@ -414,13 +391,15 @@ void Preferences::onPluginToggled (Glib::ustring const &str)
 		}
 	}
 
-	/*
-	std::vector<Glib::ustring> disable =
-		confclient_->get_string_list (disabledPlugins_.get_key ());
+	savePluginEnabledToSettings(plugin);
+}
+
+void Preferences::savePluginEnabledToSettings(Plugin *plugin) {
+	auto disable = getDisabledPlugins();
 	std::vector<Glib::ustring>::iterator dit = disable.begin();
 	std::vector<Glib::ustring>::iterator const dend = disable.end();
 	if (plugin->isEnabled() == true) {
-		// Remove from gconf list of disabled plugins
+		// Remove from list of disabled plugins
 		for (; dit != dend; ++dit) {
 			if (*dit == plugin->getShortName()) {
 				disable.erase(dit);
@@ -428,49 +407,22 @@ void Preferences::onPluginToggled (Glib::ustring const &str)
 			}
 		}
 	} else {
-		// Add to gconf list of disabled plugins
+		// Add to list of disabled plugins
 		bool found = false;
 		for (; dit != dend; ++dit)
 			if (*dit == plugin->getShortName())
 				found = true;
 		if (!found)
 			disable.push_back(plugin->getShortName());
-
 	}
-	confclient_->set_string_list (disabledPlugins_.get_key(), disable);
-	*/
+	setDisabledPlugins(disable);
 }
-
 
 
 void Preferences::disablePlugin (Plugin *plugin)
 {
-	/*
-	Gtk::ListStore::iterator it = pluginStore_->children().begin();
-	Gtk::ListStore::iterator const end = pluginStore_->children().end();
-	for (; it != end; ++it) {
-		if ((*it)[colPlugin_] == plugin) {
-			(*it)[colEnabled_] = false;
-		}
-	}
-
 	plugin->setEnabled (false);
-
-	std::vector<Glib::ustring> disable =
-		confclient_->get_string_list (disabledPlugins_.get_key ());
-	std::vector<Glib::ustring>::iterator dit = disable.begin();
-	std::vector<Glib::ustring>::iterator const dend = disable.end();
-
-
-	bool found = false;
-	for (; dit != dend; ++dit)
-		if (*dit == plugin->getShortName())
-			found = true;
-	if (!found)
-		disable.push_back(plugin->getShortName());
-
-	confclient_->set_string_list (disabledPlugins_.get_key(), disable);
-	*/
+	savePluginEnabledToSettings(plugin);
 }
 
 
@@ -530,7 +482,7 @@ void Preferences::onPluginConfigure ()
  */
 void Preferences::setPluginPref (Glib::ustring const &key, Glib::ustring const &value)
 {
-	//confclient_->set (Glib::ustring(CONF_PATH) + "/plugin/" + key, value); 
+	m_settings->set_string("plugin-" + key, value);
 }
 
 
@@ -539,5 +491,5 @@ void Preferences::setPluginPref (Glib::ustring const &key, Glib::ustring const &
  */
 Glib::ustring Preferences::getPluginPref (Glib::ustring const &key)
 {
-	//return confclient_->get_string (Glib::ustring(CONF_PATH) + "/plugin/" + key);
+	return m_settings->get_string("plugin-" + key);
 }

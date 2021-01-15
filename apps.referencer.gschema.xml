@@ -40,13 +40,16 @@
         <summary>Notes pane height</summary>
         <description></description>
     </key>
-
     <key name="window-size" type="(ii)">
         <default>(768, 600)</default>
         <summary>Window size</summary>
         <description>Window size (width and height).</description>
     </key>
-
+    <key name="disabled-plugins" type="as">
+        <default>[]</default>
+        <summary>A list of disabled plugins</summary>
+        <description></description>
+    </key>
 
     <key name="crossref-username" type="s">
       <default>''</default>
