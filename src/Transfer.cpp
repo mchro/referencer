@@ -81,9 +81,9 @@ Glib::ustring &readRemoteFile (
 	Glib::ustring const &messagetext,
 	Glib::ustring const &filename)
 {
-	Gtk::Dialog dialog (title, true, false);
+	Gtk::Dialog dialog (title, true);
 
-	Gtk::VBox *vbox = dialog.get_vbox ();
+	Gtk::Box *vbox = dialog.get_vbox ();
 	vbox->set_spacing (12);
 
 	Gtk::Label label ("", false);

@@ -146,113 +146,113 @@ protected:
         
     }
     
-    virtual void render_vfunc(
-        Glib::RefPtr<Gdk::Drawable> const & window,
-        Gtk::Widget& widget,
-        Gdk::Rectangle const & background_area,
-        Gdk::Rectangle const & cell_area,
-        Gdk::Rectangle const & expose_area,
-        Gtk::CellRendererState flags)
-    {
-        Document *doc = (Document *) property_document_.get_value ();
-	Glib::RefPtr<Gdk::Pixbuf> thumb = doc->getThumbnail ();
-        Glib::RefPtr<Gdk::GC> gc = Gdk::GC::create (window);
-        
-
-        if ((flags & (Gtk::CELL_RENDERER_SELECTED|Gtk::CELL_RENDERER_PRELIT)) != 0) {
-            Gtk::StateType state;
-
-            if ((flags & Gtk::CELL_RENDERER_SELECTED) != 0) {
-                if (widget.has_focus())
-                    state = Gtk::STATE_SELECTED;
-                else
-                    state = Gtk::STATE_ACTIVE;
-            } else {
-	            state = Gtk::STATE_PRELIGHT;
-            }
-
-		Gdk::Color color = widget.get_style()->get_base (state);
-            thumb = colorizePixbuf (thumb, color);
-        }
-        
-        window->draw_pixbuf (
-            gc, thumb,
-            0, 0,
-            cell_area.get_x(), cell_area.get_y(),
-            thumb->get_width(),
-            thumb->get_height (),
-            Gdk::RGB_DITHER_NONE,
-            0, 0);   
-
-        if (doc == docview_->hoverdoc_) {
-            flags |= Gtk::CELL_RENDERER_PRELIT;
-        }
-
-        Glib::RefPtr<Gdk::Window> window_casted = Glib::RefPtr<Gdk::Window>::cast_dynamic<>(window);
-        Gtk::StateType state = Gtk::STATE_NORMAL;
-        Gtk::ShadowType shadow = Gtk::SHADOW_OUT;
-
-        if (flags & Gtk::CELL_RENDERER_PRELIT) {
-        
-            int buttonY = thumb->get_height () - buttonHeight / 2;
-            int iconHeight = buttonHeight - buttonPad * 2;
-			int iconWidth = buttonWidth - buttonPad * 2;
-        
-            for (int i = 0; i < 3; ++i) {
-                /* Draw the button frame */
-                widget.get_style()->paint_box (
-                    window_casted, state, shadow, cell_area, widget, "cellcheck",
-                    cell_area.get_x() + i * (buttonWidth + buttonPad * 2) + buttonPad,
-                    cell_area.get_y() + buttonY,
-                    buttonWidth, buttonHeight);
-                
-
-                    Glib::RefPtr<Gdk::Pixbuf> icon;
-                    
-                    if (i == 0) {
-                        if (!tagIcon_) {
-                            Glib::ustring tagIconFile = Utility::findDataFile ("tag.svg");
-                            tagIcon_ = Gdk::Pixbuf::create_from_file (tagIconFile);
-                            tagIcon_ = tagIcon_->scale_simple (
-                                iconWidth,
-                                iconHeight,
-                                Gdk::INTERP_HYPER);
-                        }
-                        icon = tagIcon_;
-                    } else if (i == 1) {
-                        if (!propertiesIcon_) {
-                            propertiesIcon_ = widget.render_icon (Gtk::Stock::PROPERTIES, Gtk::ICON_SIZE_MENU);
-                            /*
-                            propertiesIcon_ = Utility::getThemeIcon ("gtk-properties");*/
-                            propertiesIcon_ = propertiesIcon_->scale_simple (
-                                iconWidth,
-                                iconHeight,
-                                Gdk::INTERP_HYPER);
-                        }
-
-                        icon = propertiesIcon_;
-                    } else if (i == 2) {
-                        widget.get_style()->paint_expander (window_casted,
-                        	state, cell_area, widget, "expander",
-                        	cell_area.get_x() + i * (buttonWidth + buttonPad * 2) + buttonPad * 2 + iconWidth / 2,
-                        	cell_area.get_y() + buttonY + buttonPad + iconHeight / 2,
-                        	Gtk::EXPANDER_COLLAPSED);
-                    }
-
-					if (icon) {
-	                    window->draw_pixbuf (
-	                        gc, icon,
-	                        0, 0,
-	                        cell_area.get_x() + i * (buttonWidth + buttonPad * 2) + buttonPad * 2,
-	                        cell_area.get_y() + buttonY + buttonPad,
-	                        buttonWidth - buttonPad * 2, buttonHeight - buttonPad * 2,
-	                        Gdk::RGB_DITHER_NONE,
-	                        0, 0);   
-	                }
-
-            }
-        }
-    }
+//    virtual void render_vfunc(
+//        Glib::RefPtr<Gdk::Drawable> const & window,
+//        Gtk::Widget& widget,
+//        Gdk::Rectangle const & background_area,
+//        Gdk::Rectangle const & cell_area,
+//        Gdk::Rectangle const & expose_area,
+//        Gtk::CellRendererState flags)
+//    {
+//        Document *doc = (Document *) property_document_.get_value ();
+//	Glib::RefPtr<Gdk::Pixbuf> thumb = doc->getThumbnail ();
+//        Glib::RefPtr<Gdk::GC> gc = Gdk::GC::create (window);
+//        
+//
+//        if ((flags & (Gtk::CELL_RENDERER_SELECTED|Gtk::CELL_RENDERER_PRELIT)) != 0) {
+//            Gtk::StateType state;
+//
+//            if ((flags & Gtk::CELL_RENDERER_SELECTED) != 0) {
+//                if (widget.has_focus())
+//                    state = Gtk::STATE_SELECTED;
+//                else
+//                    state = Gtk::STATE_ACTIVE;
+//            } else {
+//	            state = Gtk::STATE_PRELIGHT;
+//            }
+//
+//		Gdk::Color color = widget.get_style()->get_base (state);
+//            thumb = colorizePixbuf (thumb, color);
+//        }
+//        
+//        window->draw_pixbuf (
+//            gc, thumb,
+//            0, 0,
+//            cell_area.get_x(), cell_area.get_y(),
+//            thumb->get_width(),
+//            thumb->get_height (),
+//            Gdk::RGB_DITHER_NONE,
+//            0, 0);   
+//
+//        if (doc == docview_->hoverdoc_) {
+//            flags |= Gtk::CELL_RENDERER_PRELIT;
+//        }
+//
+//        Glib::RefPtr<Gdk::Window> window_casted = Glib::RefPtr<Gdk::Window>::cast_dynamic<>(window);
+//        Gtk::StateType state = Gtk::STATE_NORMAL;
+//        Gtk::ShadowType shadow = Gtk::SHADOW_OUT;
+//
+//        if (flags & Gtk::CELL_RENDERER_PRELIT) {
+//        
+//            int buttonY = thumb->get_height () - buttonHeight / 2;
+//            int iconHeight = buttonHeight - buttonPad * 2;
+//			int iconWidth = buttonWidth - buttonPad * 2;
+//        
+//            for (int i = 0; i < 3; ++i) {
+//                /* Draw the button frame */
+//                widget.get_style()->paint_box (
+//                    window_casted, state, shadow, cell_area, widget, "cellcheck",
+//                    cell_area.get_x() + i * (buttonWidth + buttonPad * 2) + buttonPad,
+//                    cell_area.get_y() + buttonY,
+//                    buttonWidth, buttonHeight);
+//                
+//
+//                    Glib::RefPtr<Gdk::Pixbuf> icon;
+//                    
+//                    if (i == 0) {
+//                        if (!tagIcon_) {
+//                            Glib::ustring tagIconFile = Utility::findDataFile ("tag.svg");
+//                            tagIcon_ = Gdk::Pixbuf::create_from_file (tagIconFile);
+//                            tagIcon_ = tagIcon_->scale_simple (
+//                                iconWidth,
+//                                iconHeight,
+//                                Gdk::INTERP_HYPER);
+//                        }
+//                        icon = tagIcon_;
+//                    } else if (i == 1) {
+//                        if (!propertiesIcon_) {
+//                            propertiesIcon_ = widget.render_icon (Gtk::Stock::PROPERTIES, Gtk::ICON_SIZE_MENU);
+//                            /*
+//                            propertiesIcon_ = Utility::getThemeIcon ("gtk-properties");*/
+//                            propertiesIcon_ = propertiesIcon_->scale_simple (
+//                                iconWidth,
+//                                iconHeight,
+//                                Gdk::INTERP_HYPER);
+//                        }
+//
+//                        icon = propertiesIcon_;
+//                    } else if (i == 2) {
+//                        widget.get_style()->paint_expander (window_casted,
+//                        	state, cell_area, widget, "expander",
+//                        	cell_area.get_x() + i * (buttonWidth + buttonPad * 2) + buttonPad * 2 + iconWidth / 2,
+//                        	cell_area.get_y() + buttonY + buttonPad + iconHeight / 2,
+//                        	Gtk::EXPANDER_COLLAPSED);
+//                    }
+//
+//					if (icon) {
+//	                    window->draw_pixbuf (
+//	                        gc, icon,
+//	                        0, 0,
+//	                        cell_area.get_x() + i * (buttonWidth + buttonPad * 2) + buttonPad * 2,
+//	                        cell_area.get_y() + buttonY + buttonPad,
+//	                        buttonWidth - buttonPad * 2, buttonHeight - buttonPad * 2,
+//	                        Gdk::RGB_DITHER_NONE,
+//	                        0, 0);   
+//	                }
+//
+//            }
+//        }
+//    }
     
 
     virtual bool activate_vfunc (
@@ -313,10 +313,10 @@ protected:
 };
 
 void DocumentView::doEditTagsDialog(Document *doc) {
-	Gtk::Dialog dialog (_("Edit tags"), *(win_.window_), true, false);
+	Gtk::Dialog dialog (_("Edit tags"), *(win_.window_), true);
 	/* XXX, do more clever handling of tag separation. maybe copy+modify EntryMultiCompletion class */
 
-	Gtk::VBox *vbox = dialog.get_vbox ();
+	Gtk::Box *vbox = dialog.get_vbox ();
 
 	Gtk::HBox hbox;
 	hbox.set_spacing (12);
@@ -463,7 +463,9 @@ DocumentView::DocumentView (
 	/*
 	 * Icon View
 	 */
-	Gtk::IconView *icons = Gtk::manage(new Gtk::IconView(docstoresort_));
+	Gtk::IconView *icons = Gtk::manage(new Gtk::IconView(
+				static_cast<Glib::RefPtr<Gtk::TreeModel>>(docstoresort_)
+				));
 	//icons->set_markup_column (doccaptioncol_);
 	//icons->set_pixbuf_column (docthumbnailcol_);
 
@@ -509,7 +511,7 @@ DocumentView::DocumentView (
 	icons->set_selection_mode (Gtk::SELECTION_MULTIPLE);
 	icons->set_columns (-1);
 
-	icons->set_orientation (Gtk::ORIENTATION_HORIZONTAL);
+	icons->set_item_orientation (Gtk::ORIENTATION_HORIZONTAL);
 	icons->set_item_width (70);
 
 	std::vector<Gtk::TargetEntry> dragtypes;
@@ -746,22 +748,22 @@ std::vector<Document*> DocumentView::getSelectedDocs ()
 	std::vector<Document*> docpointers;
 
 	if (uselistview_) {
-		Gtk::TreeSelection::ListHandle_Path paths =
+		auto paths =
 			docslistselection_->get_selected_rows ();
 
-		Gtk::TreeSelection::ListHandle_Path::iterator it = paths.begin ();
-		Gtk::TreeSelection::ListHandle_Path::iterator const end = paths.end ();
+		auto it = paths.begin ();
+		auto const end = paths.end ();
 		for (; it != end; it++) {
 			Gtk::TreePath sortPath = (*it);
 			Gtk::ListStore::iterator iter = docstoresort_->get_iter(sortPath);
 			docpointers.push_back((*iter)[docpointercol_]);
 		}
 	} else {
-		Gtk::IconView::ArrayHandle_TreePaths paths =
+		auto paths =
 			docsiconview_->get_selected_items ();
 
-		Gtk::IconView::ArrayHandle_TreePaths::iterator it = paths.begin ();
-		Gtk::IconView::ArrayHandle_TreePaths::iterator const end = paths.end ();
+		auto it = paths.begin ();
+		auto const end = paths.end ();
 		for (; it != end; it++) {
 			Gtk::TreePath sortPath = (*it);
 			Gtk::ListStore::iterator iter = docstoresort_->get_iter(sortPath);
@@ -786,7 +788,7 @@ std::vector<Document*> DocumentView::getSelectedDocs ()
 Document *DocumentView::getSelectedDoc ()
 {
 	if (uselistview_) {
-		Gtk::TreeSelection::ListHandle_Path paths =
+		auto paths =
 			docslistselection_->get_selected_rows ();
 
 		if (paths.size() != 1) {
@@ -799,7 +801,7 @@ Document *DocumentView::getSelectedDoc ()
 		return (*iter)[docpointercol_];
 
 	} else {
-		Gtk::IconView::ArrayHandle_TreePaths paths =
+		auto paths =
 			docsiconview_->get_selected_items ();
 
 		if (paths.size() != 1) {
@@ -1195,14 +1197,14 @@ void DocumentView::updateVisible ()
 	//Scroll to the currently selected document, if any
 	Gtk::TreePath selpath;
 	if (uselistview_) {
-		Gtk::TreeSelection::ListHandle_Path paths =
+		auto paths =
 			docslistselection_->get_selected_rows ();
 		if (paths.size () > 0) {
 			selpath = (*paths.begin());
 			docslistview_->scroll_to_row (selpath);
 		}
 	} else {
-		Gtk::IconView::ArrayHandle_TreePaths paths =
+		auto paths =
 			docsiconview_->get_selected_items ();
 		if (paths.size () > 0) {
 			selpath = (*paths.begin());
@@ -1304,12 +1306,12 @@ void DocumentView::populateDocStore ()
 	// Save initial selection
 	Gtk::TreePath initialpath;
 	if (uselistview_) {
-		Gtk::TreeSelection::ListHandle_Path paths =
+		auto paths =
 			docslistselection_->get_selected_rows ();
 		if (paths.size () > 0)
 			initialpath = (*paths.begin());
 	} else {
-		Gtk::IconView::ArrayHandle_TreePaths paths =
+		auto paths =
 			docsiconview_->get_selected_items ();
 		if (paths.size () > 0)
 			initialpath = (*paths.begin());
@@ -1359,13 +1361,13 @@ void DocumentView::onSearchChanged ()
 	if (!searchentry_->get_text ().empty()) {
 	/*if (entry->priv->is_a11y_theme)
 		return;*/
-		searchentry_->modify_base (Gtk::STATE_NORMAL, yellowish);
-		searchentry_->modify_text (Gtk::STATE_NORMAL, black);
+		//searchentry_->modify_base (Gtk::STATE_NORMAL, yellowish);
+		//searchentry_->modify_text (Gtk::STATE_NORMAL, black);
 		//if (!hasclearbutton)
 		//	((Sexy::IconEntry*) searchentry_)->add_clear_button ();
 	} else {
-		searchentry_->unset_base (Gtk::STATE_NORMAL);
-		searchentry_->unset_text (Gtk::STATE_NORMAL);
+		//searchentry_->unset_base (Gtk::STATE_NORMAL);
+		//searchentry_->unset_text (Gtk::STATE_NORMAL);
 		//if (hasclearbutton)
 		//	((Sexy::IconEntry*) searchentry_)->set_icon (Sexy::ICON_ENTRY_SECONDARY, NULL);
 	}
@@ -1430,7 +1432,7 @@ void DocumentView::addColumn (
 	col->set_resizable (true);
 	col->set_expand (expand);
 	col->set_sort_column (modelCol);
-	cell = (Gtk::CellRendererText *) col->get_first_cell_renderer ();
+	cell = (Gtk::CellRendererText *) col->get_first_cell();
 	if (ellipsize)
 		cell->property_ellipsize () = Pango::ELLIPSIZE_END;
 	cell->property_editable () = true;

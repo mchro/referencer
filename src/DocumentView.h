@@ -10,7 +10,6 @@
 
 #include <map>
 
-#include <gtk/gtkversion.h>
 #include <gtkmm.h>
 
 class Document;
