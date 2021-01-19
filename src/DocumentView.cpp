@@ -442,9 +442,7 @@ DocumentView::DocumentView (
 	doccols.add(docpointercol_);
 	doccols.add(doccaptioncol_);
 	doccols.add(docthumbnailcol_);
-#if GTK_VERSION_GE(2,12)
 	doccols.add(doctooltipcol_);
-#endif
 	doccols.add(dockeycol_);
 	doccols.add(doctitlecol_);
 	doccols.add(docauthorscol_);
@@ -482,11 +480,7 @@ DocumentView::DocumentView (
 
 	Gtk::CellRendererText *textcell = new Gtk::CellRendererText ();
 	textcell->property_width_chars() = 32;
-	//textcell->property_wrap_width() = 32;
-/* FIXME: guesstimate of which version.  It's something >=2.10 */
-#if GTK_VERSION_GE(2,12)
 	textcell->property_wrap_mode() = Pango::WRAP_WORD_CHAR;
-#endif
 	gtk_cell_layout_pack_start (cell_layout, GTK_CELL_RENDERER (textcell->gobj()), true);
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (icons->gobj()),
 		GTK_CELL_RENDERER (textcell->gobj()),
@@ -494,10 +488,8 @@ DocumentView::DocumentView (
 		NULL);
 	
 	icons->add_events (Gdk::ALL_EVENTS_MASK);
-#if GTK_VERSION_GE(2,12)
 	// Nasty, gtkmm doesn't have a binding for passing the column object
 	icons->set_tooltip_column (3);
-#endif
 	icons->signal_item_activated().connect (
 		sigc::mem_fun (*this, &DocumentView::docActivated));
 
@@ -1073,8 +1065,6 @@ void DocumentView::loadRow (
 	(*item)[docauthorscol_] = doc->getBibData().getAuthors ();
 	(*item)[docyearcol_] = doc->getBibData().getYear ();
 
-	#if GTK_VERSION_GE(2,12)
-
 	Glib::ustring tooltipText =
 		String::ucompose(
 				"<b>%1</b>\n",
@@ -1094,7 +1084,6 @@ void DocumentView::loadRow (
 	}
 
 	(*item)[doctooltipcol_] = tooltipText;
-	#endif
 	(*item)[docvisiblecol_] = isVisible (doc);
 
 	Glib::ustring title = Utility::wrap (doc->getField ("title"), 35, 1, false);
