@@ -221,7 +221,9 @@ void DocumentProperties::setupFields (Glib::ustring const &docType)
 	Gtk::VBox *metadataBox;
   xml_->get_widget ("MetadataBox", metadataBox);
 	if (metadataBox->get_children().size()) {
-		metadataBox->get_children().erase(metadataBox->get_children().begin());
+        for (const auto& c : metadataBox->get_children()) {
+            metadataBox->remove(*c);
+        }
 	}
 
 	DocumentType type = typeManager_.getType (docType);
