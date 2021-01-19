@@ -13,27 +13,28 @@
 void Linker::createUI (RefWindow *window, DocumentView *view)
 {
 
-//	static bool iconCreated = false;
-//	if (!iconCreated) {
-//		/* Factory for creating stock icons */
-//		Glib::RefPtr<Gtk::IconFactory> iconFactory = Gtk::IconFactory::create();
-//		iconFactory->add_default ();
-//
-//		Gtk::IconSource iconSource;
-//		iconSource.set_pixbuf( Utility::getThemeIcon ("web-browser") );
-//		iconSource.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
-//		iconSource.set_size_wildcarded(); //Icon may be scaled.
-//		Gtk::IconSet iconSet;
-//		iconSet.add_source (iconSource);
-//		Gtk::StockID stockId = Gtk::StockID ("web-browser");
-//		iconFactory->add (stockId, iconSet);
-//
-//		iconCreated = true;
-//	}
+	static bool iconCreated = false;
+	if (!iconCreated) {
+		/* Factory for creating stock icons */
+		Glib::RefPtr<Gtk::IconFactory> iconFactory = Gtk::IconFactory::create();
+		iconFactory->add_default ();
+
+		Gtk::IconSource iconSource;
+		iconSource.set_pixbuf( Utility::getThemeIcon ("emblem-web") );
+		iconSource.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
+		iconSource.set_size_wildcarded(); //Icon may be scaled.
+
+		Glib::RefPtr<Gtk::IconSet> iconSet = Gtk::IconSet::create();
+		iconSet->add_source (iconSource);
+		Gtk::StockID stockId = Gtk::StockID ("emblem-web");
+		iconFactory->add (stockId, iconSet);
+
+		iconCreated = true;
+	}
 
 	Glib::ustring action = Glib::ustring("linker_") + getName();
 	window->actiongroup_->add (
-		Gtk::Action::create (action, Gtk::StockID("web-browser"), getLabel()),
+		Gtk::Action::create (action, Gtk::StockID("emblem-web"), getLabel()),
 		sigc::bind(
 			sigc::mem_fun (view, &DocumentView::invokeLinker),
 			this));
