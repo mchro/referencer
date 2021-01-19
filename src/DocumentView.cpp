@@ -668,10 +668,9 @@ void DocumentView::onDocMouseMotion (GdkEventMotion* event)
 	int y = (int)event->y;
 
 	Gtk::TreeModel::Path path = docsiconview_->get_path_at_pos (x, y);
-	bool havepath = path.gobj() != NULL;
 
 	Document *doc = NULL;
-	if (havepath) {
+	if (!path.empty()) {
 		Gtk::ListStore::iterator it = docstoresort_->get_iter (path);
 		doc = (*it)[docpointercol_];
 	}
@@ -881,7 +880,7 @@ bool DocumentView::docClicked (GdkEventButton* event)
 			Gtk::TreeModel::Path clickedpath =
 				docsiconview_->get_path_at_pos ((int)event->x, (int)event->y);
 
-			if (clickedpath.gobj() != NULL
+			if (!clickedpath.empty()
 			    && !docsiconview_->path_is_selected (clickedpath)) {
 				docsiconview_->unselect_all ();
 				docsiconview_->select_path (clickedpath);
