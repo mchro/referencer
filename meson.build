@@ -76,6 +76,7 @@ sources = files(
   'src/BibUtils.cpp',
   'src/cpprossRefPlugin.cpp',
   'src/Document.cpp',
+  'src/DocumentCellRenderer.cpp',
   'src/DocumentList.cpp',
   'src/DocumentProperties.cpp',
   'src/DocumentTypes.cpp',
