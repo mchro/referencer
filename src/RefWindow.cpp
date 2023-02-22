@@ -125,7 +125,7 @@ void RefWindow::constructUI ()
 		Glib::RefPtr<Gdk::Pixbuf> icon = Gdk::Pixbuf::create_from_file(
 			Utility::findDataFile("referencer.svg"));
 		window_->set_icon (icon);
-	} catch (Gdk::PixbufError ex) {
+	} catch (Gdk::PixbufError& ex) {
 	}
 
 	/* Vbox fills the whole window */
@@ -264,7 +264,7 @@ void RefWindow::constructUI ()
 		*render, sigc::mem_fun (*this, &RefWindow::tagCellRenderer));
 	namecol->add_attribute (render->property_markup (), tagnamecol_);
 	namecol->add_attribute (render->property_font_desc (), tagfontcol_);
-	((Gtk::CellRendererText*)(std::vector<Gtk::CellRenderer*>(namecol->get_cell_renderers())[0]))->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
+	((Gtk::CellRendererText*)(std::vector<Gtk::CellRenderer*>(namecol->get_cells())[0]))->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
 	
 	tags->append_column (*namecol);
 	tags->signal_button_press_event().connect_notify(
@@ -289,7 +289,7 @@ void RefWindow::constructUI ()
 
 	Gtk::Toolbar& tagbar = (Gtk::Toolbar&) *uimanager_->get_widget("/TagBar");
 	tagbar.set_toolbar_style (Gtk::TOOLBAR_BOTH_HORIZ);
-	tagbar.set_orientation (Gtk::ORIENTATION_VERTICAL);
+	//tagbar.set_orientation (Gtk::ORIENTATION_VERTICAL);
 	tagbar.set_show_arrow (false);
 	std::vector<Gtk::Widget*> tagbarButtons = tagbar.get_children ();
 	std::vector<Gtk::Widget*>::iterator buttonIter = tagbarButtons.begin ();
@@ -606,7 +606,6 @@ void RefWindow::updateTagSizes ()
 
 	/* What was I smoking when I wrote TagList?  Mung it into a more
 	 * useful data structure. */
-	typedef std::map<Glib::ustring, std::pair<int, int> > SensibleMap;
 	std::map<Glib::ustring, std::pair<int, int> > sensibleTags;
 	TagList::TagMap allTags = library_->getTagList()->getTags();
 	TagList::TagMap::iterator sensibleIter = allTags.begin();
@@ -635,7 +634,7 @@ void RefWindow::updateTagSizes ()
 			factor = (float)useCount / (float)doccount;
 		}
 
-		int size = (int)((float)(window_->get_style ()->get_font().get_size ()) * (0.95f + (factor * 0.1f)));
+		int size = (int)((float)(window_->get_style_context ()->get_font().get_size ()) * (0.95f + (factor * 0.1f)));
 
 
 		Pango::FontDescription font;
@@ -655,7 +654,7 @@ void RefWindow::updateTagSizes ()
 
 void RefWindow::populateTagList ()
 {
-	Gtk::TreeSelection::ListHandle_Path paths =
+	auto paths =
 			tagselection_->get_selected_rows ();
 	Gtk::TreePath initialpath;
 	if (paths.size() > 0)
@@ -831,7 +830,7 @@ void RefWindow::tagNameEdited (
 	Glib::ustring const &text2)
 {
 	// Text1 is the row number, text2 is the new setting
-	Gtk::TreeSelection::ListHandle_Path paths =
+	auto paths =
 		tagselection_->get_selected_rows ();
 
 	if (paths.empty ()) {
@@ -893,7 +892,7 @@ void RefWindow::tagSelectionChanged ()
 	if (ignoreTagSelectionChanged_)
 		return;
 
-	Gtk::TreeSelection::ListHandle_Path paths =
+	auto paths =
 		tagselection_->get_selected_rows ();
 
 	filtertags_.clear();
@@ -906,8 +905,8 @@ void RefWindow::tagSelectionChanged ()
 		anythingselected = true;
 		filtertags_.push_back(ALL_TAGS_UID);
 	} else {
-		Gtk::TreeSelection::ListHandle_Path::iterator it = paths.begin ();
-		Gtk::TreeSelection::ListHandle_Path::iterator const end = paths.end ();
+		auto it = paths.begin ();
+		auto const end = paths.end ();
 		for (; it != end; it++) {
 			anythingselected = true;
 			Gtk::TreePath path = (*it);
@@ -1172,7 +1171,7 @@ void RefWindow::onCreateAndAttachTag ()
 
 void RefWindow::onDeleteTag ()
 {
-	Gtk::TreeSelection::ListHandle_Path paths =
+	auto paths =
 		tagselection_->get_selected_rows ();
 
 	if (paths.empty()) {
@@ -1182,8 +1181,8 @@ void RefWindow::onDeleteTag ()
 
 	std::vector <int> uidstodelete;
 
-	Gtk::TreeSelection::ListHandle_Path::iterator it = paths.begin ();
-	Gtk::TreeSelection::ListHandle_Path::iterator const end = paths.end ();
+	auto it = paths.begin ();
+	auto const end = paths.end ();
 	for (; it != end; it++) {
 		Gtk::TreePath path = (*it);
 		Gtk::ListStore::iterator iter = tagstore_->get_iter (path);
@@ -1234,7 +1233,7 @@ void RefWindow::onDeleteTag ()
 
 void RefWindow::onRenameTag ()
 {
-	Gtk::TreeSelection::ListHandle_Path paths =
+	auto paths =
 		tagselection_->get_selected_rows ();
 
 	if (paths.empty ()) {
@@ -1261,14 +1260,14 @@ void RefWindow::onExportBibtex ()
 	chooser.set_default_response (Gtk::RESPONSE_ACCEPT);
 	chooser.set_do_overwrite_confirmation (true);
 
-	Gtk::FileFilter bibtexfiles;
-	bibtexfiles.add_pattern ("*.[bB][iI][bB]");
-	bibtexfiles.set_name (_("BibTeX Files"));
+	auto bibtexfiles = Gtk::FileFilter::create();
+	bibtexfiles->add_pattern ("*.[bB][iI][bB]");
+	bibtexfiles->set_name (_("BibTeX Files"));
 	chooser.add_filter (bibtexfiles);
 
-	Gtk::FileFilter allfiles;
-	allfiles.add_pattern ("*");
-	allfiles.set_name (_("All Files"));
+	auto allfiles = Gtk::FileFilter::create();
+	allfiles->add_pattern ("*");
+	allfiles->set_name (_("All Files"));
 	chooser.add_filter (allfiles);
 
 	Gtk::VBox extrabox;
@@ -1282,8 +1281,8 @@ void RefWindow::onExportBibtex ()
 	Gtk::Label label (_("Selection:"));
 	selectionbox.pack_start (label, false, false, 0);
 	Gtk::ComboBoxText combo;
-	combo.append_text (_("All Documents"));
-	combo.append_text (_("Selected Documents"));
+	combo.append (_("All Documents"));
+	combo.append (_("Selected Documents"));
 	combo.set_active (0);
 	selectionbox.pack_start (combo, true, true, 0);
 	combo.set_sensitive (docview_->getSelectedDocCount ());
@@ -1342,14 +1341,14 @@ void RefWindow::onNotesExport ()
 	chooser.set_default_response (Gtk::RESPONSE_ACCEPT);
 	chooser.set_do_overwrite_confirmation (true);
 
-	Gtk::FileFilter htmlfiles;
-	htmlfiles.add_pattern ("*.[Hh][Tt][Mm][Ll*]");
-	htmlfiles.set_name (_("HTML Files"));
+	auto htmlfiles = Gtk::FileFilter::create();
+	htmlfiles->add_pattern ("*.[Hh][Tt][Mm][Ll*]");
+	htmlfiles->set_name (_("HTML Files"));
 	chooser.add_filter (htmlfiles);
 
-	Gtk::FileFilter allfiles;
-	allfiles.add_pattern ("*");
-	allfiles.set_name (_("All Files"));
+	auto allfiles = Gtk::FileFilter::create();
+	allfiles->add_pattern ("*");
+	allfiles->set_name (_("All Files"));
 	chooser.add_filter (allfiles);
 
 	Gtk::VBox extrabox;
@@ -1363,9 +1362,9 @@ void RefWindow::onNotesExport ()
 	Gtk::Label label (_("Selection:"));
 	selectionbox.pack_start (label, false, false, 0);
 	Gtk::ComboBoxText combo;
-	combo.append_text (_("All Documents"));
-	combo.append_text (_("Currently Shown Documents"));
-	combo.append_text (_("Selected Documents"));
+	combo.append (_("All Documents"));
+	combo.append (_("Currently Shown Documents"));
+	combo.append (_("Selected Documents"));
 	if (docview_->getSelectedDocCount ()) {
 		/* there is a selection */
 		combo.set_active (2);
@@ -1424,9 +1423,6 @@ void RefWindow::onNotesExport ()
 			linkers.push_back(&url);
 			linkers.push_back(&pubmed);
 			linkers.push_back(&google);
-
-			std::vector<Linker*>::iterator it = linkers.begin ();
-			std::vector<Linker*>::iterator const end = linkers.end ();
 		}
 		/* }}} */
 		
@@ -1500,14 +1496,14 @@ void RefWindow::manageBrowseDialog (Gtk::Entry *entry)
 	dialog.add_button (Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
 	dialog.set_do_overwrite_confirmation ();
 
-	Gtk::FileFilter bibtexfiles;
-	bibtexfiles.add_pattern ("*.[bB][iI][bB]");
-	bibtexfiles.set_name (_("BibTeX Files"));
+	auto bibtexfiles = Gtk::FileFilter::create();
+	bibtexfiles->add_pattern ("*.[bB][iI][bB]");
+	bibtexfiles->set_name (_("BibTeX Files"));
 	dialog.add_filter (bibtexfiles);
 
-	Gtk::FileFilter allfiles;
-	allfiles.add_pattern ("*");
-	allfiles.set_name (_("All Files"));
+	auto allfiles = Gtk::FileFilter::create();
+	allfiles->add_pattern ("*");
+	allfiles->set_name (_("All Files"));
 	dialog.add_filter (allfiles);
 
 	if (dialog.run() == Gtk::RESPONSE_OK) {
@@ -1535,11 +1531,11 @@ void RefWindow::onLibraryFolder ()
 
 void RefWindow::onManageBibtex ()
 {
-	Gtk::Dialog dialog (_("Manage BibTeX File"), true, false);
+	Gtk::Dialog dialog (_("Manage BibTeX File"), true);
 
 	dialog.add_button (Gtk::Stock::CLOSE, Gtk::RESPONSE_CANCEL);
 
-	Gtk::VBox *vbox = dialog.get_vbox ();
+	Gtk::Box *vbox = dialog.get_vbox ();
 	Gtk::VBox mybox;
 	vbox->pack_start (mybox);
 	vbox = &mybox;
@@ -1673,14 +1669,14 @@ void RefWindow::onOpenLibrary ()
 	chooser.add_button (Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
 	chooser.set_default_response (Gtk::RESPONSE_ACCEPT);
 
-	Gtk::FileFilter reflibfiles;
-	reflibfiles.add_pattern ("*.reflib");
-	reflibfiles.set_name (_("Referencer Libraries"));
+	auto reflibfiles = Gtk::FileFilter::create();
+	reflibfiles->add_pattern ("*.reflib");
+	reflibfiles->set_name (_("Referencer Libraries"));
 	chooser.add_filter (reflibfiles);
 
-	Gtk::FileFilter allfiles;
-	allfiles.add_pattern ("*");
-	allfiles.set_name (_("All Files"));
+	auto allfiles = Gtk::FileFilter::create();
+	allfiles->add_pattern ("*");
+	allfiles->set_name (_("All Files"));
 	chooser.add_filter (allfiles);
 
 	if (chooser.run () == Gtk::RESPONSE_ACCEPT) {
@@ -1742,14 +1738,14 @@ void RefWindow::onSaveAsLibrary ()
 	chooser.set_default_response (Gtk::RESPONSE_ACCEPT);
 	chooser.set_do_overwrite_confirmation (true);
 
-	Gtk::FileFilter reflibfiles;
-	reflibfiles.add_pattern ("*.reflib");
-	reflibfiles.set_name (_("Referencer Libraries"));
+	auto reflibfiles = Gtk::FileFilter::create();
+	reflibfiles->add_pattern ("*.reflib");
+	reflibfiles->set_name (_("Referencer Libraries"));
 	chooser.add_filter (reflibfiles);
 
-	Gtk::FileFilter allfiles;
-	allfiles.add_pattern ("*");
-	allfiles.set_name (_("All Files"));
+	auto allfiles = Gtk::FileFilter::create();
+	allfiles->add_pattern ("*");
+	allfiles->set_name (_("All Files"));
 	chooser.add_filter (allfiles);
 
 	// Browsing to remote hosts not working for some reason
@@ -1867,9 +1863,9 @@ RefWindow::TaggerDialog::TaggerDialog (RefWindow *window, TagList *taglist)
 	/* Show a dialog containing a treeview of checkboxes for
 	 * tags, and a button for creating tags */
 	set_title (_("Tag Added Files"));
-	set_has_separator (false);
+	//set_has_separator (false);
 
-	Gtk::VBox *vbox = get_vbox ();
+	Gtk::Box *vbox = get_vbox ();
 	vbox->set_spacing (12);
 
 	/* Map of selected tags */
@@ -1902,7 +1898,7 @@ RefWindow::TaggerDialog::TaggerDialog (RefWindow *window, TagList *taglist)
 
 	view_->append_column (*selected);
 	Gtk::TreeViewColumn *name_column = (Gtk::manage (new Gtk::TreeViewColumn ("", nameColumn_)));
-	((Gtk::CellRendererText*)(std::vector<Gtk::CellRenderer*>(name_column->get_cell_renderers())[0]))->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
+	((Gtk::CellRendererText*)(std::vector<Gtk::CellRenderer*>(name_column->get_cells())[0]))->property_ellipsize() = Pango::ELLIPSIZE_MIDDLE;
 	view_->append_column (*name_column);
 
 	/* "Create tag" button */
@@ -1969,10 +1965,10 @@ void RefWindow::addDocFiles (std::vector<Glib::ustring> const &filenames)
 	/* List of documents we add */
 	std::vector<Document*> addedDocs;
 
-	Gtk::Dialog dialog (_("Add Document Files"), true, false);
+	Gtk::Dialog dialog (_("Add Document Files"), true);
 	dialog.set_icon (window_->get_icon());
 
-	Gtk::VBox *vbox = dialog.get_vbox ();
+	Gtk::Box *vbox = dialog.get_vbox ();
 	vbox->set_spacing (12);
 
 	Glib::ustring messagetext =
@@ -2182,9 +2178,9 @@ void RefWindow::onAddDocById ()
 {
 	static Glib::ustring lastSelected;
 
-	Gtk::Dialog dialog (_("Add Reference with ID"), true, false);
+	Gtk::Dialog dialog (_("Add Reference with ID"), true);
 
-	Gtk::VBox *vbox = dialog.get_vbox ();
+	Gtk::Box *vbox = dialog.get_vbox ();
 
 
 	/* Populate structures of ID type names, IDs */
@@ -2210,7 +2206,7 @@ void RefWindow::onAddDocById ()
 	std::vector<Glib::ustring>::iterator nameIter = capNames.begin();
 	std::vector<Glib::ustring>::iterator const nameEnd = capNames.end();
 	for (; nameIter != nameEnd; ++nameIter) {
-		combo.append_text (*nameIter);
+		combo.append(*nameIter);
 	}
 
 	if (!lastSelected.empty())
@@ -2391,7 +2387,6 @@ void RefWindow::onGetMetadataDoc ()
 {
 	progress_->start (_("Fetching metadata"));
 
-	bool doclistdirty = false;
 	std::vector <Document*> docs = docview_->getSelectedDocs ();
 	std::vector <Document*>::iterator it = docs.begin ();
 	std::vector <Document*>::iterator const end = docs.end ();
@@ -2399,7 +2394,6 @@ void RefWindow::onGetMetadataDoc ()
 		Document* doc = *it;
 		if (doc->canGetMetadata ()) {
 			setDirty (true);
-			doclistdirty = true;
 			doc->getMetaData ();
 			docview_->updateDoc(doc);
 		}
@@ -2711,22 +2705,22 @@ void RefWindow::onImport ()
 	chooser.add_button (Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
 	chooser.set_default_response (Gtk::RESPONSE_ACCEPT);
 
-	Gtk::FileFilter allfiles;
-	allfiles.add_pattern ("*");
-	allfiles.set_name (_("All Files"));
+	auto allfiles = Gtk::FileFilter::create();
+	allfiles->add_pattern ("*");
+	allfiles->set_name (_("All Files"));
 	chooser.add_filter (allfiles);
 
-	Gtk::FileFilter allbibfiles;
+	auto allbibfiles = Gtk::FileFilter::create();
 	// Complete random guesses, what are the real extensions?
-	allbibfiles.add_pattern ("*.ris");
-	allbibfiles.add_pattern ("*.[bB][iI][bB]");
-	allbibfiles.add_pattern ("*.ref");
-	allbibfiles.set_name (_("Bibliography Files"));
+	allbibfiles->add_pattern ("*.ris");
+	allbibfiles->add_pattern ("*.[bB][iI][bB]");
+	allbibfiles->add_pattern ("*.ref");
+	allbibfiles->set_name (_("Bibliography Files"));
 	chooser.add_filter (allbibfiles);
 
-	Gtk::FileFilter bibtexfiles;
-	bibtexfiles.add_pattern ("*.[bB][iI][bB]");
-	bibtexfiles.set_name (_("BibTeX Files"));
+	auto bibtexfiles = Gtk::FileFilter::create();
+	bibtexfiles->add_pattern ("*.[bB][iI][bB]");
+	bibtexfiles->set_name (_("BibTeX Files"));
 	chooser.add_filter (bibtexfiles);
 
 	Gtk::HBox extrabox;
@@ -2735,10 +2729,10 @@ void RefWindow::onImport ()
 	Gtk::Label label (_("Format:"));
 	extrabox.pack_start (label, false, false, 0);
 	Gtk::ComboBoxText combo;
-	combo.append_text ("BibTeX");
-	combo.append_text ("EndNote");
-	combo.append_text ("RIS");
-	combo.append_text ("MODS");
+	combo.append ("BibTeX");
+	combo.append ("EndNote");
+	combo.append ("RIS");
+	combo.append ("MODS");
 	//combo.append_text (_("Auto Detect"));
 	combo.set_active (0);
 	extrabox.pack_start (combo, true, true, 0);

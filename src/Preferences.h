@@ -16,7 +16,6 @@
 #include <utility>
 
 #include <gtkmm.h>
-#include <gconfmm.h>
 
 #include "Utility.h"
 #include "PluginManager.h"
@@ -47,7 +46,9 @@ private:
 	void onPluginAbout ();
 	void onPluginConfigure ();
 
-	Gnome::Conf::Entry disabledPlugins_;
+	std::vector<Glib::ustring> getDisabledPlugins();
+	void setDisabledPlugins (std::vector<Glib::ustring> disabledPlugins);
+	void savePluginEnabledToSettings(Plugin *plugin);
 	public:
 	void disablePlugin (Plugin *plugin);
 
@@ -62,9 +63,6 @@ private:
 	/*
 	 * Conf for crossref plugin
 	 */
-private:
-	Gnome::Conf::Entry crossRefUsername_;
-	Gnome::Conf::Entry crossRefPassword_;
 public:
 	Glib::ustring getCrossRefUsername ();
 	Glib::ustring getCrossRefPassword ();
@@ -78,9 +76,6 @@ public:
 	/*
 	 * List view options
 	 */
-private:
-	Gnome::Conf::Entry listSortColumn_;
-	Gnome::Conf::Entry listSortOrder_;
 public:
 	std::pair<Glib::ustring, int> getListSort ();
 	void setListSort (Glib::ustring const &columnName, int const order);
@@ -105,24 +100,7 @@ private:
 	void onProxyChanged ();
 	void updateSensitivity ();
 
-	void onConfChange (int number, Gnome::Conf::Entry entry);
-
-	Gnome::Conf::Entry workoffline_;
-	Gnome::Conf::Entry uselistview_;
-	Gnome::Conf::Entry showtagpane_;
-	Gnome::Conf::Entry shownotespane_;
-	Gnome::Conf::Entry libraryfilename_;
-	Gnome::Conf::Entry width_;
-	Gnome::Conf::Entry height_;
-	Gnome::Conf::Entry notesheight_;
-
-	Gnome::Conf::Entry proxymode_;
-	Gnome::Conf::Entry proxyuseproxy_;
-	Gnome::Conf::Entry proxyuseauth_;
-	Gnome::Conf::Entry proxyhost_;
-	Gnome::Conf::Entry proxyport_;
-	Gnome::Conf::Entry proxyusername_;
-	Gnome::Conf::Entry proxypassword_;
+	void onSettingsChange (const Glib::ustring& key);
 
 	sigc::signal<void> workofflinesignal_;
 	sigc::signal<void> uselistviewsignal_;
@@ -132,19 +110,12 @@ private:
 
 	bool ignoreChanges_;
 
-	Glib::RefPtr<Gnome::Conf::Client> confclient_;
-
-	// Set when our gconf directory didn't exist, the first time the
-	// program is run
-	bool firsttime_;
+	Glib::RefPtr<Gio::Settings> m_settings;
 
 public:
 	Preferences ();
 	~Preferences ();
 	void showDialog ();
-
-	// Nothing uses this, hopefully nothing will
-	//Glib::RefPtr<Gnome::Conf::Client> getConfClient () {return confclient_;}
 
 	Glib::ustring getLibraryFilename ();
 	void setLibraryFilename (Glib::ustring const &filename);
@@ -174,8 +145,6 @@ public:
 	
 	int getNotesPaneHeight ();
 	void setNotesPaneHeight (int height);
-
-	bool const getFirstTime () {return firsttime_;}
 };
 
 extern Preferences *_global_prefs;

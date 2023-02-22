@@ -42,13 +42,11 @@ bool ThumbnailGenerator::run ()
 	//Stuff to do?
 	Glib::ustring file;
 
-	bool gotJob = false;
 	if (taskList_.size () > 0) {
 		std::multimap<Glib::ustring, Document *>::iterator it = taskList_.begin ();
 		std::pair<Glib::ustring, Document *> task = *it;
 
 		file = task.first;
-		gotJob = true;
 		DEBUG("gotJob: '%1'", file);
 		lookupThumb_async(file);
 	}
@@ -154,7 +152,6 @@ void ThumbnailGenerator::_taskAbort ()
 Glib::RefPtr<Gdk::Pixbuf> ThumbnailGenerator::lookupThumb (Glib::ustring const &file)
 {
 	Glib::RefPtr<Gdk::Pixbuf> thumbnail;
-	GdkPixbuf* thumbnail_c;
 
 	Glib::RefPtr<Gio::File> uri = Gio::File::create_for_uri (file);
 

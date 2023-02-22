@@ -23,7 +23,6 @@ import os
 import referencer
 from referencer import _
 import sys, urllib2, urllib
-import gobject
 import gtk
 
 from xml.dom import minidom

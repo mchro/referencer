@@ -2225,7 +2225,7 @@ TextDialog::TextDialog (
 		Glib::ustring const &title,
 		Glib::ustring const &text)
 {
-	Gtk::Dialog (title, true, false);
+	Gtk::Dialog (title, true);
 
 	Glib::RefPtr<Gtk::TextBuffer> buffer = Gtk::TextBuffer::create ();
 	buffer->set_text (text);

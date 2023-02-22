@@ -205,7 +205,7 @@ int DocumentList::importFromFile (
 
 	try {
 		importfile = liburi->read ();
-	} catch (const Gio::Error ex) {
+	} catch (const Gio::Error& ex) {
 		Utility::exceptionDialog (&ex,
 		                          String::ucompose (
 				_("Opening file '%1'"),
@@ -224,7 +224,7 @@ int DocumentList::importFromFile (
 
 	try {
 		importfile->read (buffer, fileinfo->get_size());
-	} catch (const Gio::Error ex) {
+	} catch (const Gio::Error& ex) {
 		Utility::exceptionDialog (&ex,
 			String::ucompose (
 				_("Reading file '%1'"),
@@ -280,7 +280,7 @@ int DocumentList::import (
 
 	try {
 		BibUtils::biblFromString (b, rawtext, format, p);
-	} catch (Glib::Error ex) {
+	} catch (Glib::Error& ex) {
 		BibUtils::bibl_free( &b );
 		Utility::exceptionDialog (&ex, _("Parsing import"));
 		return 0;
@@ -292,7 +292,7 @@ int DocumentList::import (
 	for (int i = 0; i < nrefs; ++i) {
 		try {
 			docs_.push_back (BibUtils::parseBibUtils (b.ref[i]));
-		} catch (Glib::Error ex) {
+		} catch (Glib::Error& ex) {
 			BibUtils::bibl_free( &b );
 			Utility::exceptionDialog (&ex,
 				String::ucompose(_("Extracting document %1 from bibutils structure"), i));

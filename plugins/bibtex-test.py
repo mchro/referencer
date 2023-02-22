@@ -6,7 +6,6 @@ import os
 import referencer
 from referencer import _
 
-import gobject
 import gtk
 
 referencer_plugin_info = {

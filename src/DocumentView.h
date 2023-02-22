@@ -10,7 +10,6 @@
 
 #include <map>
 
-#include <gtk/gtkversion.h>
 #include <gtkmm.h>
 
 class Document;
@@ -29,7 +28,7 @@ class DocumentView : public Gtk::VBox
 	void updateAllDocs ();
 	void updateDoc (Document * const doc);
 	void removeDoc (Document * const doc);
-	void addDoc (Document * doc);
+	void addDoc (Document * doc, bool userTriggered = true);
 	void updateVisible ();
 	void clear ();
 
@@ -87,7 +86,6 @@ class DocumentView : public Gtk::VBox
 	Gtk::Entry *searchentry_;
 	void onSearchChanged ();
 	friend void end_search (GPtrArray * out_array, GError * error, gpointer user_data);
-	std::list<Glib::ustring> trackerUris_;
 
 	/* Signal that we fire whenever selection changes in one of our views */
 	sigc::signal<void> selectionchangedsignal_;

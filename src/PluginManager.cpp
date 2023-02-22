@@ -23,8 +23,6 @@ PluginManager *_global_plugins;
 
 
 
-static int numargs=0;
-
 /* Return the number of arguments of the application command line */
 static PyObject*
 referencer_download(PyObject *self, PyObject *args)
@@ -41,7 +39,7 @@ referencer_download(PyObject *self, PyObject *args)
 			PyString_AsString(url));
 		ret = PyString_FromString (xml.c_str());
 		DEBUG (String::ucompose ("got %1 characters", xml.length()));
-	} catch (Transfer::Exception ex) {
+	} catch (Transfer::Exception& ex) {
 		Utility::exceptionDialog (&ex, _("Downloading metadata"));
 		Glib::ustring blank;
 		ret = PyString_FromString (blank.c_str());

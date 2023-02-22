@@ -230,7 +230,7 @@ bool CrossRefPlugin::resolve (Document &doc)
 	Glib::ustring const password = _global_prefs->getCrossRefPassword ();
 
 	Glib::ustring const url = 
-		  Glib::ustring("http://www.crossref.org/openurl/?pid=")
+		  Glib::ustring("http://doi.crossref.org/openurl/?pid=")
 		+ username
 		+ (password.empty() ? "" : ":")
 		+ password 
@@ -261,12 +261,12 @@ bool CrossRefPlugin::resolve (Document &doc)
 		try {
 			context.parse (xml);
 			context.end_parse ();
-		} catch (Glib::MarkupError const ex) {
+		} catch (Glib::MarkupError const& ex) {
 			DEBUG ("Markuperror while parsing:\n'''%1\n'''", xml);
 			//Utility::exceptionDialog (&ex, _("Parsing CrossRef XML.  The DOI could be invalid, or not known to crossref.org"));
 			success = false;
 		}
-	} catch (Transfer::Exception ex) {
+	} catch (Transfer::Exception& ex) {
 		//Utility::exceptionDialog (&ex, _("Downloading metadata"));
 		success = false;
 	}

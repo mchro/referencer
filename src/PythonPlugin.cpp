@@ -180,10 +180,10 @@ void PythonPlugin::load (std::string const &moduleName)
 					iconSource.set_pixbuf( Gdk::Pixbuf::create_from_file(iconFile) );
 					iconSource.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
 					iconSource.set_size_wildcarded(); //Icon may be scaled.
-					Gtk::IconSet iconSet;
-					iconSet.add_source (iconSource);
-					stockId = Gtk::StockID (Glib::ustring("referencer") + Glib::ustring (name));
-					iconFactory->add (stockId, iconSet);
+					//Gtk::IconSet iconSet;
+					//iconSet.add_source (iconSource);
+					//stockId = Gtk::StockID (Glib::ustring("referencer") + Glib::ustring (name));
+					//iconFactory->add (stockId, iconSet);
 				} catch(const Glib::Exception& ex) {
 					/* File not found, show error icon */
 					DEBUG (ex.what());
@@ -214,8 +214,8 @@ void PythonPlugin::load (std::string const &moduleName)
 
 int PythonPlugin::canResolve (Document &doc)
 {
-    if (pCanResolveFunc_ == NULL)
-        return -1;
+	if (pCanResolveFunc_ == NULL)
+		return -1;
 
 	referencer_document *pDoc =
 		PyObject_New (referencer_document, &t_referencer_document);
@@ -230,7 +230,7 @@ int PythonPlugin::canResolve (Document &doc)
 
     int toret = -1;
 	if (pReturn != NULL) {
-        toret = PyLong_AsLong(pReturn);
+		toret = PyLong_AsLong(pReturn);
 		Py_DECREF(pReturn);
 	} else {
 		DEBUG ("PythonPlugin::resolveID: NULL return from PyObject_CallObject");

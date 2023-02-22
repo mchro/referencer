@@ -224,7 +224,7 @@ void LibraryData::clear() {
     library_folder_uri_ = "";
 }
 
-void LibraryData::extractData(xmlDocPtr libDocument) throw (Glib::Exception) {
+void LibraryData::extractData(xmlDocPtr libDocument) {
     this->clear();
     xmlNodePtr node = xmlDocGetRootElement(libDocument);
     if (node && node->type == XML_ELEMENT_NODE && nodeNameEq(node,
@@ -281,7 +281,7 @@ void Library::writeXML(xmlTextWriterPtr writer) {
     xmlTextWriterEndElement(writer);
 }
 
-bool Library::readXML(Gio::InputStream *inputStream) throw(Glib::Exception) {
+bool Library::readXML(Gio::InputStream *inputStream) {
     if (inputStream == NULL)
         return false;
 
@@ -393,7 +393,6 @@ bool Library::load (Glib::ustring const &libfilename)
 
     //progress.update(0.2);
 
-    int i = 0;
     DocumentList::Container &docs = data->doclist_->getDocs();
     DocumentList::Container::iterator docit = docs.begin();
     DocumentList::Container::iterator const docend = docs.end();
@@ -504,7 +503,7 @@ void Library::writeBibtex (
 	try {
 		std::string new_etag;
 		bibfile->replace_contents (bibtext.str(), "", new_etag);
-	} catch (const Gio::Error ex) {
+	} catch (const Gio::Error& ex) {
 		Utility::exceptionDialog (&ex, "writing to BibTex file");
 		return;
 	}

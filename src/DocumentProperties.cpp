@@ -98,7 +98,7 @@ DocumentProperties::DocumentProperties (
 	// to get information that the cell(s) changed 
 	Gtk::CellRendererText* extrafieldsrenderer = 
 		dynamic_cast<Gtk::CellRendererText*> (
-		extrafieldsview_->get_column(1)->get_first_cell_renderer() );
+		extrafieldsview_->get_column(1)->get_first_cell() );
 	extrafieldsrenderer->signal_edited ().connect (
 		sigc::mem_fun (*this, &DocumentProperties::onExtraFieldEdited));
 
@@ -220,8 +220,10 @@ void DocumentProperties::setupFields (Glib::ustring const &docType)
 {
 	Gtk::VBox *metadataBox;
   xml_->get_widget ("MetadataBox", metadataBox);
-	if (metadataBox->children().size()) {
-		metadataBox->children().erase(metadataBox->children().begin());
+	if (metadataBox->get_children().size()) {
+        for (const auto& c : metadataBox->get_children()) {
+            metadataBox->remove(*c);
+        }
 	}
 
 	DocumentType type = typeManager_.getType (docType);
@@ -233,7 +235,7 @@ void DocumentProperties::setupFields (Glib::ustring const &docType)
 
 	fieldEntries_.clear ();
 
-	Gtk::Label *typeLabel = Gtk::manage (new Gtk::Label (_("_Type:"), Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, true));
+	Gtk::Label *typeLabel = Gtk::manage (new Gtk::Label (_("_Type:"), Gtk::ALIGN_START, Gtk::ALIGN_CENTER, true));
 	
 	if (typecombochanged_)
 		typecombochanged_.disconnect();
@@ -269,7 +271,7 @@ void DocumentProperties::setupFields (Glib::ustring const &docType)
 		if (it->shortField_)
 			continue;
 
-		Gtk::Label *label = Gtk::manage (new Gtk::Label (it->displayName_ + ":", Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, false));
+		Gtk::Label *label = Gtk::manage (new Gtk::Label (it->displayName_ + ":", Gtk::ALIGN_START, Gtk::ALIGN_CENTER, false));
 		Gtk::Entry *entry = Gtk::manage (new Gtk::Entry ());
 
 		/* [bert] Minor change to actually implement and register
@@ -295,7 +297,7 @@ void DocumentProperties::setupFields (Glib::ustring const &docType)
 		if (it->shortField_)
 			continue;
 
-		Gtk::Label *label = Gtk::manage (new Gtk::Label (it->displayName_ + ":", Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, false));
+		Gtk::Label *label = Gtk::manage (new Gtk::Label (it->displayName_ + ":", Gtk::ALIGN_START, Gtk::ALIGN_CENTER, false));
 		Gtk::Entry *entry = Gtk::manage (new Gtk::Entry ());
 
 		fieldEntries_[it->internalName_] = entry;
@@ -314,7 +316,7 @@ void DocumentProperties::setupFields (Glib::ustring const &docType)
 		if (!it->shortField_)
 			continue;
 
-		Gtk::Label *label = Gtk::manage (new Gtk::Label (it->displayName_ + ":", Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, false));
+		Gtk::Label *label = Gtk::manage (new Gtk::Label (it->displayName_ + ":", Gtk::ALIGN_START, Gtk::ALIGN_CENTER, false));
 		Gtk::Entry *entry = Gtk::manage (new Gtk::Entry ());
 
 		fieldEntries_[it->internalName_] = entry;
@@ -335,7 +337,7 @@ void DocumentProperties::setupFields (Glib::ustring const &docType)
 		if (!it->shortField_)
 			continue;
 
-		Gtk::Label *label = Gtk::manage (new Gtk::Label (it->displayName_ + ":", Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, false));
+		Gtk::Label *label = Gtk::manage (new Gtk::Label (it->displayName_ + ":", Gtk::ALIGN_START, Gtk::ALIGN_CENTER, false));
 		Gtk::Entry *entry = Gtk::manage (new Gtk::Entry ());
 
 		fieldEntries_[it->internalName_] = entry;
@@ -357,9 +359,9 @@ void DocumentProperties::setupFields (Glib::ustring const &docType)
 
 void DocumentProperties::onNewExtraField ()
 {
-	Gtk::Dialog dialog ("New Field", *dialog_, true, false);
+	Gtk::Dialog dialog ("New Field", *dialog_, true);
 
-	Gtk::VBox *vbox = dialog.get_vbox ();
+	Gtk::Box *vbox = dialog.get_vbox ();
 
 	Gtk::HBox hbox;
 	hbox.set_spacing (12);
@@ -419,7 +421,7 @@ void DocumentProperties::onDeleteExtraField ()
 
 void DocumentProperties::onEditExtraField ()
 {
-	Gtk::TreeSelection::ListHandle_Path paths =
+	auto paths =
 		extrafieldssel_->get_selected_rows ();
 
 	if (paths.empty ()) {

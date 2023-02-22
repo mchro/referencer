@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/apps/referencer/" id="apps.referencer">
+    <key name="library-filename" type="s">
+      <default>''</default>
+      <summary>Library filename</summary>
+      <description>The library filename last opened.</description>
+    </key>
+    <key name="work-offline" type="b">
+      <default>false</default>
+      <summary>Work in offline mode</summary>
+      <description>In offline mode no requests should be made.</description>
+    </key>
+    <key name="view-type" type="s">
+      <choices>
+        <choice value='icon'/>
+        <choice value='list'/>
+      </choices>
+      <default>'icon'</default>
+      <summary>View type</summary>
+      <description>View to use for main display.</description>
+    </key>
+    <key name="list-sort" type="(si)">
+        <default>('title', 0)</default>
+        <summary>List sort column and order</summary>
+        <description></description>
+    </key>
+    <key name="show-tag-pane" type="b">
+      <default>true</default>
+      <summary>Show tag pane</summary>
+      <description></description>
+    </key>
+    <key name="show-notes-pane" type="b">
+      <default>true</default>
+      <summary>Show notes pane</summary>
+      <description></description>
+    </key>
+    <key name="notes-pane-height" type="i">
+        <default>-1</default>
+        <summary>Notes pane height</summary>
+        <description></description>
+    </key>
+    <key name="window-size" type="(ii)">
+        <default>(768, 600)</default>
+        <summary>Window size</summary>
+        <description>Window size (width and height).</description>
+    </key>
+    <key name="disabled-plugins" type="as">
+        <default>[]</default>
+        <summary>A list of disabled plugins</summary>
+        <description></description>
+    </key>
+
+    <key name="crossref-username" type="s">
+      <default>''</default>
+      <summary>Crossref username</summary>
+      <description>If you have a member account use your Crossref username; otherwise guest access is possible if you use your email address, see https://www.crossref.org/education/retrieve-metadata/openurl/#00375.</description>
+    </key>
+    <key name="crossref-password" type="s">
+      <default>''</default>
+      <summary>Crossref password</summary>
+      <description>If you have a member account use your Crossref password; for guest access leave blank.</description>
+    </key>
+  </schema>
+</schemalist>

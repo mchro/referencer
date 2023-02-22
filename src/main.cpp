@@ -32,12 +32,11 @@ int main (int argc, char **argv)
 
 	if (!Glib::thread_supported())
 		Glib::thread_init(0); //So we can use GMutex.
-	Gnome::Conf::init();
 
-	std::auto_ptr<Gtk::Main> mainInstance;
+	std::unique_ptr<Gtk::Main> mainInstance;
 	try
 	{
-		mainInstance = std::auto_ptr<Gtk::Main>( new Gtk::Main(argc, argv) );
+		mainInstance = std::unique_ptr<Gtk::Main>( new Gtk::Main(argc, argv) );
 	}
 	catch(const Glib::Error& ex)
 	{
@@ -78,9 +77,9 @@ int main (int argc, char **argv)
 	Py_Initialize ();
 
 	_global_plugins = new PluginManager ();
-	_global_plugins->scan("./plugins");
-	_global_plugins->scan(homePlugins);
-	_global_plugins->scan(PLUGINDIR);
+	//_global_plugins->scan("./plugins");
+	//_global_plugins->scan(homePlugins);
+	//_global_plugins->scan(PLUGINDIR);
 
 	_global_prefs = new Preferences();
 
@@ -93,7 +92,7 @@ int main (int argc, char **argv)
 	try {
 		RefWindow window;
 		window.run();
-	} catch (Glib::Error ex) {
+	} catch (const Glib::Error& ex) {
 		Utility::exceptionDialog (&ex, _("Terminating due to unhandled exception"));
 	}
 

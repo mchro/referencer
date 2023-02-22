@@ -81,9 +81,9 @@ Glib::ustring &readRemoteFile (
 	Glib::ustring const &messagetext,
 	Glib::ustring const &filename)
 {
-	Gtk::Dialog dialog (title, true, false);
+	Gtk::Dialog dialog (title, true);
 
-	Gtk::VBox *vbox = dialog.get_vbox ();
+	Gtk::Box *vbox = dialog.get_vbox ();
 	vbox->set_spacing (12);
 
 	Gtk::Label label ("", false);
@@ -151,7 +151,7 @@ void fetcherThread (Glib::ustring const &filename, Glib::RefPtr<Gio::Cancellable
 		Glib::RefPtr<Gio::File> file =
 			Gio::File::create_for_uri (filename);
 		file->load_contents(cancellable, buffer, len);
-	} catch (const Glib::Error ex) {
+	} catch (const Glib::Error& ex) {
 		DEBUG ("Got an exception from load_contents", ex.what());
 		transferStatus |= TRANSFER_FAIL_SILENT;
 		return;
