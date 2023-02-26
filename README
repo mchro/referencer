@@ -2,73 +2,48 @@
 Referencer
 ==========
     A document organiser and bibliography manager
-        http://icculus.org/referencer/
+	https://github.com/mchro/referencer
+        (Previous homepage: http://icculus.org/referencer/)
 
-Need help?
-	http://icculus.org/referencer/introduction.html
-	http://icculus.org/referencer/faq.html
-	There is a mailing list.  Send a blank email to
-	referencer-subscribe@icculus.org to subscribe.
-	To post to the list, send messages to referencer@icculus.org.
-
-Author: John Spray (jcspray at icculus.org)
+Original author: John Spray (jcspray at icculus.org)
+Current best-effort maintainer: Mads Chr. Olesen (mads at mchro.dk)
 
 Building
 ========
 
-A simple './configure && make' should build the referencer executable, if the dependencies are present.
+Builds using meson.
+A simple 'meson builddir && meson compile -C builddir/' should build the referencer executable, if the dependencies are present.
 
 The build dependencies are:
 	g++
 	poppler-glib
-	gtkmm-2.4 (incl. svg support for GDK eg. librsvg2-common)
-	libgnomeuimm-2.6 
-	gnome-vfsmm-2.6 (incl. http support, eg. libgnomevfs2-extra)
-	libglademm-2.4
-	gconfmm-2.6
+	gtkmm-3.0
 	boost_regex
 	intltool
-	gnome-icon-theme
 	python
 	python API
-	yelp
-	gnome-doc-utils
 
 
-On Ubuntu 8.10:
-	sudo apt-get install build-essential libpoppler-glib-dev libgtkmm-2.4-dev libgnomeuimm-2.6-dev libgnome-vfsmm-2.6-dev libglademm-2.4-dev libgconfmm-2.6-dev libboost-dev intltool python-dev gnome-icon-theme librsvg2-common libgnomevfs2-extra libboost-regex-dev gnome-common automake gnome-doc-utils
-
-On Ubuntu 6.10 (or 6.06 LTS):
-	sudo apt-get install build-essential libpoppler-glib-dev libgtkmm-2.4-dev libgnomeuimm-2.6-dev libgnome-vfsmm-2.6-dev libglademm-2.4-dev libgconfmm-2.6-dev libboost-dev intltool python-dev gnome-icon-theme librsvg2-common libgnomevfs2-extra
-
-On 8.04 you will also require libboost-regex-dev
-
-(note that libboost-regex-dev is in the 'universe' repository, which is not enabled in a default Ubuntu install.  See https://help.ubuntu.com/ubuntu/desktopguide/C/extra-repositories.html)
-
-On Fedora Core 5, you will need to do:
-	yum install gtkmm24-devel libgnomeuimm26-devel gnome-vfsmm26-devel libglademm24-devel gconfmm26-devel poppler-devel gcc-c++ boost-devel python-devel
-
+On Ubuntu 22.04:
+	sudo apt-get install build-essential libpoppler-glib-dev libgtkmm-3.0-dev libboost-dev intltool python2-dev libboost-regex-dev
 
 Installing
 ==========
 
-Referencer may be run in-place from the build directory (type src/referencer)
+Referencer may be run in-place from the build directory (type `builddir/referencer`)
 for convenient evaluation or testing.  Alternatively, it maybe installed
-systemwide: running 'make install' should install Referencer into the 
-/usr/local prefix by default, use "--prefix /somewhere" when running
-./configure to install it elsewhere.
+systemwide: running 'meson install -C builddir' should install Referencer into the 
+/usr/local prefix by default.
 
 Attributions
 ============
 
-libbibutils is copied from the bibutils 3.27 package, Copyright © Chris Putnam 2005
 The wvConvertUnicodeToLaTeX function is based on the function of the same name in the wv library, Copyright © Caolan McNamara, Dom Lachowicz, and others
 The eel_* functions are copied from libeel, Copyright © 2000 Eazel, Inc.
 The art_rgb_run_alpha function is copied from libart, Copyright © Raph Levien 1998
 The thumbnail_frame.png graphic is copied from Nautilus, Copyright © 2003 Redhat, Inc
 ucompose.hpp is from the string composition library, Copyright © 2003 Ole Laursen, licensed under the LGPL
 The ev-tooltip class is Copyright (C) 2004 Red Hat, Inc
-The sexy-icon-entry class is Copyright (C) 2004-2006 Christian Hammond
 mozUrlSelectionToUTF8 is derived from gnome-terminal, Copyright 2001 Havoc Pennington
 The EntryMultiCompletion widget is copied from the gtkmm-utils 0.4.1 package, Copyright © Marko Anastasov 2008
 ustring.{cc,h} is copied from the gtkmm-utils 0.4.1 package, Copyright © Dodji Seketeli and Marko Anastasov
