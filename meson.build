@@ -25,6 +25,10 @@ gnome.compile_schemas(
   build_by_default: true,
   depend_files: files('apps.referencer.gschema.xml')
 )
+install_data('apps.referencer.gschema.xml',
+   install_dir: get_option('datadir') / 'glib-2.0/schemas',
+)
+gnome.post_install(glib_compile_schemas: true)
 
 config_h = configuration_data()
 # package
