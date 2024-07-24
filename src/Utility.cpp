@@ -27,8 +27,6 @@
 */
 
 #include <gtkmm.h>
-// The gtkmm in Ubuntu 6.04 doesn't seem to get this in <gtkmm.h>
-#include <gtkmm/icontheme.h>
 #include <glibmm/i18n.h>
 #include <giomm/file.h>
 #include <giomm/fileinfo.h>
@@ -501,9 +499,12 @@ Glib::RefPtr<Gdk::Pixbuf> getThemeIcon(Glib::ustring const &iconname)
 			Glib::RefPtr<Gdk::Pixbuf> pixbuf =
 				theme->load_icon(iconname, 96, Gtk::ICON_LOOKUP_FORCE_SVG);
 			
-			if (!pixbuf)
+			if (!pixbuf) {
 				DEBUG ("Utility::getThemeIcon: icon '%1' failed to load", iconname);
+			}
+			else {
 				return pixbuf;
+			}
 		} else {
 			DEBUG ("Utility::getThemeIcon: icon '%1' no found", iconname);
 		}
