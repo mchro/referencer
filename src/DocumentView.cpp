@@ -670,7 +670,7 @@ void DocumentView::popupContextMenu (GdkEventButton* event)
 	/*
 	 * Display the menu
 	 */
-	popupmenu->popup (event->button, event->time);
+	popupmenu->popup_at_pointer (reinterpret_cast<GdkEvent*>(event));
 }
 
 
