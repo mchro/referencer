@@ -2287,14 +2287,10 @@ void RefWindow::onAddDocFile ()
 	if (chooser.run () == Gtk::RESPONSE_ACCEPT) {
 		// Dirty is set in adddocfiles
 		addfolder_ = Glib::path_get_dirname(chooser.get_filename());
-		Glib::SListHandle<Glib::ustring> uris = chooser.get_uris ();
+		std::vector<Glib::ustring> uris = chooser.get_uris ();
 		chooser.hide ();
 
-		std::vector<Glib::ustring> newfiles;
-		for (Glib::SListHandle<Glib::ustring>::iterator iter = uris.begin(); iter != uris.end(); ++iter) {
-			newfiles.push_back (*iter);
-		}
-		addDocFiles (newfiles);
+		addDocFiles (uris);
 	}
 }
 
