@@ -4,7 +4,7 @@ project('referencer', 'cpp',
   default_options: [
     'cpp_std=c++11'
   ],
-  meson_version: '>= 0.48.0',
+  meson_version: '>= 0.57.0',
 )
 
 referencer_name = meson.project_name().to_lower()
