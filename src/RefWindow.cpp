@@ -89,7 +89,7 @@ void RefWindow::signalException ()
     } catch (const Glib::Exception &ex) {
         Utility::exceptionDialog (&ex, "executing UI action");
     } catch (const std::exception &ex) {
-        DEBUG (Glib::ustring("std::exception in signal handler, what=") + ex.what());
+        DEBUG ("std::exception in signal handler, what=", ex.what());
 
     } catch (...) {
         DEBUG ("Unknown type of exception in signal handler");
@@ -558,7 +558,7 @@ void RefWindow::onEnabledPluginsPrefChanged ()
 			try {
 				pluginUI_[(*pit)->getShortName()] = uimanager_->add_ui_from_string (ui);
 			} catch (Glib::MarkupError &ex) {
-				DEBUG (String::ucompose("Error merging UI For plugin %1, exception %2", (*pit)->getShortName(), ex.what()));
+				DEBUG ("Error merging UI For plugin %1, exception %2", (*pit)->getShortName(), ex.what());
 			}
 		} else if (!(*pit)->isEnabled() && mergeId) {
 			/* Remove plugin actions and UI */
@@ -1209,7 +1209,7 @@ void RefWindow::onDeleteTag ()
 		confirmdialog.set_default_response (Gtk::RESPONSE_CANCEL);
 
 		if (confirmdialog.run () == Gtk::RESPONSE_ACCEPT) {
-			DEBUG (String::ucompose ("going to delete %1", (*iter)[taguidcol_]));
+			DEBUG ("going to delete %1", (*iter)[taguidcol_]);
 			uidstodelete.push_back ((*iter)[taguidcol_]);
 		}
 	}
@@ -1217,7 +1217,7 @@ void RefWindow::onDeleteTag ()
 	std::vector<int>::iterator uidit = uidstodelete.begin ();
 	std::vector<int>::iterator const uidend = uidstodelete.end ();
 	for (; uidit != uidend; ++uidit) {
-		DEBUG (String::ucompose ("really deleting %1", *uidit));
+		DEBUG ("really deleting %1", *uidit);
 		// Take it off any docs
 		library_->getDocList()->clearTag(*uidit);
 		// Remove it from the tag list
@@ -1430,7 +1430,7 @@ void RefWindow::onNotesExport ()
 		   if it gets more complicated */
 		std::ofstream notesfile(chooser.get_filename().c_str());
 		if (!notesfile) {
-			DEBUG (String::ucompose ("Error opening '%1'", chooser.get_filename()));
+			DEBUG ("Error opening '%1'", chooser.get_filename());
 			notesfile.close ();
 			return;
 		}
@@ -1509,9 +1509,9 @@ void RefWindow::manageBrowseDialog (Gtk::Entry *entry)
 	if (dialog.run() == Gtk::RESPONSE_OK) {
 	//Gnome::Vfs::get_uri_from_local_path (urientry.get_text ()
 		Glib::ustring relpath = Utility::relPath (openedlib_, dialog.get_uri ());
-		DEBUG (String::ucompose ("manage path: %1", dialog.get_uri()));
-		DEBUG (String::ucompose ("library path: %1", openedlib_));
-		DEBUG (String::ucompose ("relative path: %1", relpath));
+		DEBUG ("manage path: %1", dialog.get_uri());
+		DEBUG ("library path: %1", openedlib_);
+		DEBUG ("relative path: %1", relpath);
 		// Effect is that we are always setting a UTF-8 filename
 		// NOT a URI.
 		if (!relpath.empty ()) {
@@ -1559,16 +1559,16 @@ void RefWindow::onManageBibtex ()
 	Gtk::Entry urientry;
 	hbox.pack_start (urientry);
 
-	DEBUG (String::ucompose ("Got bibtextarget = %1", library_->getBibtexTarget()));
+	DEBUG ("Got bibtextarget = %1", library_->getBibtexTarget());
 	Glib::RefPtr<Gio::File> uri =
   		Gio::File::create_for_uri (library_->getBibtexTarget () );
     Glib::ustring bibfilename = uri->get_uri ();
 
-	DEBUG (String::ucompose ("Got absolute path = %1", bibfilename));
+	DEBUG ("Got absolute path = %1", bibfilename);
 	// Did we fail?  (if so then it's a relative path)
 	if (bibfilename.empty ()) {
 		bibfilename = Glib::uri_unescape_string (library_->getBibtexTarget ());
-		DEBUG (String::ucompose ("Got relative path = %1", bibfilename));
+		DEBUG ("Got relative path = %1", bibfilename);
 	}
 	urientry.set_text (bibfilename);
 
@@ -1614,7 +1614,7 @@ void RefWindow::onManageBibtex ()
 	} else {
 		newtarget = newfilename;
 	}
-	DEBUG (String::ucompose ("newtarget: %1", newtarget));
+	DEBUG ("newtarget: %1", newtarget);
 
 
 	bool const newbraces = bracescheck.get_active ();
@@ -1686,7 +1686,7 @@ void RefWindow::onOpenLibrary ()
 
 		setDirty (false);
 
-		DEBUG (String::ucompose("Calling library_->load on %1", libfile));
+		DEBUG ("Calling library_->load on %1", libfile);
 		if (library_->load (libfile)) {
 			ignoreDocSelectionChanged_ = true;
 			ignoreTagSelectionChanged_ = true;
@@ -2097,7 +2097,7 @@ void RefWindow::addDocFiles (std::vector<Glib::ustring> const &filenames)
 			key = newdoc->getKey ();
 				
 		} else {
-			DEBUG (String::ucompose ("RefWindow::addDocFiles: Warning: didn't succeed adding '%1'.  Duplicate file?\n", *it));
+			DEBUG ("RefWindow::addDocFiles: Warning: didn't succeed adding '%1'.  Duplicate file?\n", *it);
 		}
 
 	
@@ -2363,7 +2363,7 @@ void RefWindow::onRemoveDoc ()
 	std::vector<Document*>::iterator it = docs.begin ();
 	std::vector<Document*>::iterator const end = docs.end ();
 	for (; it != end; it++) {
-		DEBUG (String::ucompose ("RefWindow::onRemoveDoc: removeDoc on '%1'", *it));
+		DEBUG ("RefWindow::onRemoveDoc: removeDoc on '%1'", *it);
 		docview_->removeDoc (*it);
 		library_->getDocList()->removeDoc(*it);
 	}
@@ -2806,7 +2806,7 @@ void RefWindow::onPasteBibtex (GdkAtom selection)
 	int imported =
 		library_->getDocList()->import (clipboardtext, BibUtils::FORMAT_BIBTEX);
 
-	DEBUG (String::ucompose ("Imported %1 references", imported));
+	DEBUG ("Imported %1 references", imported);
 
 	if (imported) {
 

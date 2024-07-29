@@ -353,7 +353,7 @@ void writeBibKey (
 	}
 
 	if (!value.validate ()) {
-		DEBUG (String::ucompose ("Bad unicode for key %1", key));
+		DEBUG ("Bad unicode for key %1", key);
 		return;
 	}
 

@@ -386,7 +386,7 @@ bool Library::load (Glib::ustring const &libfilename)
         Utility::exceptionDialog(&ex, "opening library '"
                 + fileinfo->get_display_name () + "'");
     }
-    DEBUG(String::ucompose("Done, got %1 docs", data->doclist_->getDocs().size()));
+    DEBUG("Done, got %1 docs", data->doclist_->getDocs().size());
     //XXX: progress calls commented out, since they flush events,
     //causing the thumbnail generator to run but with invalid filenames
     // -mchro

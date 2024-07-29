@@ -72,7 +72,7 @@ int main (int argc, char **argv)
 	pythonPath += installedPlugins;
 	pythonPath += ":";
 	/* Export the path */
-	DEBUG (String::ucompose ("setting pythonPath to %1", pythonPath));
+	DEBUG ("setting pythonPath to %1", pythonPath);
 	setenv ("PYTHONPATH", pythonPath.c_str(), 1);
 	Py_Initialize ();
 

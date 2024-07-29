@@ -60,7 +60,7 @@ Preferences::Preferences ()
 		for (; dit != dend; ++dit) {
 			if ((*pit)->getShortName() == (*dit)) {
 				(*pit)->setEnabled(false);
-				DEBUG (String::ucompose ("disabling plugin %1", (*pit)->getShortName()));
+				DEBUG ("disabling plugin %1", (*pit)->getShortName());
 			}
 		}
 	}
@@ -146,7 +146,7 @@ void Preferences::onSettingsChange (const Glib::ustring& key)
 	    ) {
 		;
 	} else {
-		DEBUG (String::ucompose("unhandled key %1", key));
+		DEBUG ("unhandled key %1", key);
 	}
 
 	ignoreChanges_ = false;
@@ -338,9 +338,9 @@ void Preferences::onPluginToggled (Glib::ustring const &str)
 		plugin->setEnabled (enable);
 
 	if (enable) {
-		DEBUG (String::ucompose("enabling plugin %1", plugin->getShortName()));
+		DEBUG ("enabling plugin %1", plugin->getShortName());
 	} else {
-		DEBUG (String::ucompose("disabling plugin %1", plugin->getShortName()));
+		DEBUG ("disabling plugin %1", plugin->getShortName());
 	}
 
 	(*it)[colEnabled_] = plugin->isEnabled ();

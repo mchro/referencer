@@ -38,7 +38,7 @@ referencer_download(PyObject *self, PyObject *args)
 			PyString_AsString(message),
 			PyString_AsString(url));
 		ret = PyString_FromString (xml.c_str());
-		DEBUG (String::ucompose ("got %1 characters", xml.length()));
+		DEBUG ("got %1 characters", xml.length());
 	} catch (Transfer::Exception& ex) {
 		Utility::exceptionDialog (&ex, _("Downloading metadata"));
 		Glib::ustring blank;
@@ -188,7 +188,7 @@ void PluginManager::scan (std::string const &pluginDir)
 
 		if (name.substr(name.size() - 3, name.size() - 1) == ".py") {
 			std::string const moduleName = name.substr (0, name.size() - 3);
-			DEBUG (String::ucompose("found module %1", moduleName));
+			DEBUG ("found module %1", moduleName);
 
 
 			// Check we haven't already loaded this module

@@ -23,7 +23,7 @@
 #include <libxml/xmlstring.h>
 
 #include "ucompose.hpp"
-#define DEBUG(x,...) Utility::debug(__PRETTY_FUNCTION__, String::ucompose(x, ##__VA_ARGS__))
+#define DEBUG(...) Utility::debug(__PRETTY_FUNCTION__, String::ucompose( __VA_ARGS__ ))
 
 #define DELETE(x)			{ if (x) { delete x; } }
 #define DELETE_AND_NULL(x) 	{ if (x) { delete x; x = NULL; } }

@@ -88,7 +88,7 @@ void PythonPlugin::load (std::string const &moduleName)
 	}
 
 	if (!PyDict_Check (pPluginInfo_)) {
-		DEBUG (String::ucompose ("%1:Info dict isn't a dict!  Old plugin?", moduleName));
+		DEBUG ("%1:Info dict isn't a dict!  Old plugin?", moduleName);
 
 		Py_DECREF (pMod_);
 		return;
@@ -123,7 +123,7 @@ void PythonPlugin::load (std::string const &moduleName)
 		}
 		Py_DECREF (pCaps);
 	} else {
-		DEBUG (String::ucompose ("no metadata capabilities in %1", moduleName_));
+		DEBUG ("no metadata capabilities in %1", moduleName_);
 	}
 
 	/* Extract metadata lookup function */
@@ -186,7 +186,7 @@ void PythonPlugin::load (std::string const &moduleName)
 					//iconFactory->add (stockId, iconSet);
 				} catch(const Glib::Exception& ex) {
 					/* File not found, show error icon */
-					DEBUG (ex.what());
+					DEBUG ("File not found:", ex.what());
 					stockId = Gtk::StockID (Gtk::Stock::DIALOG_ERROR);
 				}
 			}
@@ -202,12 +202,12 @@ void PythonPlugin::load (std::string const &moduleName)
 		}
 		Py_DECREF (pActions);
 	} else {
-		DEBUG (String::ucompose ("No actions in %1", moduleName_));
+		DEBUG ("No actions in %1", moduleName_);
 	}
 
 
 
-	DEBUG (String::ucompose ("successfully loaded %1", moduleName));
+	DEBUG ("successfully loaded %1", moduleName);
 
 	loaded_ = true;
 }

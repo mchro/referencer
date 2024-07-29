@@ -309,10 +309,10 @@ void Document::updateRelFileName (Glib::ustring const &libfilename)
 
 	if ( doc_is_relative_to_library ) {
 		relfilename_ = relative_path;
-		DEBUG (String::ucompose ("Set relfilename_ '%1'", relfilename_));
+		DEBUG ("Set relfilename_ '%1'", relfilename_);
 	} else {
 		relfilename_ = "";
-		DEBUG (String::ucompose ("Not relative"));
+		DEBUG ("Not relative");
 	}
 }
 
@@ -739,7 +739,7 @@ void Document::renameFromKey ()
 
 void Document::setField (Glib::ustring const &field, Glib::ustring const &value)
 {
-	DEBUG (String::ucompose ("%1 : %2", field, value));
+	DEBUG ("%1 : %2", field, value);
 	if (field == "doi")
 		bib_.setDoi (value);
 	else if (field.lowercase() == "title")

@@ -46,19 +46,19 @@ BibData::BibData ()
  */
 void BibData::print () const
 {
-	DEBUG (String::ucompose ("%1: %2\n", "DOI: ", doi_));
-	DEBUG (String::ucompose ("%1: %2\n", "Title: ", title_));
-	DEBUG (String::ucompose ("%1: %2\n", "Authors: ", authors_));
-	DEBUG (String::ucompose ("%1: %2\n", "Journal: ", journal_));
-	DEBUG (String::ucompose ("%1: %2\n", "Volume: ", volume_));
-	DEBUG (String::ucompose ("%1: %2\n", "Number: ", issue_));
-	DEBUG (String::ucompose ("%1: %2\n", "Pages: ", pages_));
-	DEBUG (String::ucompose ("%1: %2\n", "Year: ", year_));
+	DEBUG ("%1: %2\n", "DOI: ", doi_);
+	DEBUG ("%1: %2\n", "Title: ", title_);
+	DEBUG ("%1: %2\n", "Authors: ", authors_);
+	DEBUG ("%1: %2\n", "Journal: ", journal_);
+	DEBUG ("%1: %2\n", "Volume: ", volume_);
+	DEBUG ("%1: %2\n", "Number: ", issue_);
+	DEBUG ("%1: %2\n", "Pages: ", pages_);
+	DEBUG ("%1: %2\n", "Year: ", year_);
 	
 	ExtrasMap::const_iterator it = extras_.begin ();
 	ExtrasMap::const_iterator const end = extras_.end ();
 	for (; it != end; ++it) {
-		DEBUG (String::ucompose ("%1: %2\n", it->first, it->second));
+		DEBUG ("%1: %2\n", it->first, it->second);
 	}
 }
 
