@@ -19,7 +19,13 @@
 
 extern "C" {
 namespace BibUtils {
-#include "libbibutils/bibutils.h"
+
+extern char *progname;
+
+#include <bibutils/bibutils.h>
+//Yuck; bibutils #defines a couple of very generic terms
+#undef DOI
+#undef URL
 
 typedef enum {
 	FORMAT_BIBTEX = BIBL_BIBTEXIN,
@@ -37,12 +43,9 @@ std::string formatPerson (std::string const &munged);
 
 Document parseBibUtils (BibUtils::fields *ref);
 
-Format guessFormat (std::string const &rawtext);
-
 void biblFromString (
 	bibl &b,
 	std::string const &rawtext,
-	Format format,
 	param &p);
 
 }

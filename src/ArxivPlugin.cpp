@@ -78,11 +78,11 @@ bool ArxivPlugin::resolve (Document &doc)
 	BibUtils::param p;
 	BibUtils::bibl b;
 	BibUtils::bibl_init( &b );
-	BibUtils::bibl_initparams( &p, BibUtils::FORMAT_BIBTEX, BIBL_MODSOUT);
+	BibUtils::bibl_initparams( &p, BibUtils::FORMAT_BIBTEX, BIBL_MODSOUT, BibUtils::progname);
 
 	try {
-		BibUtils::biblFromString (b, *rawtext, BibUtils::FORMAT_BIBTEX, p);
-		if (b.nrefs < 1)
+		BibUtils::biblFromString (b, *rawtext, p);
+		if (b.n < 1)
 			return false;
 
 		Document newdoc = BibUtils::parseBibUtils (b.ref[0]);

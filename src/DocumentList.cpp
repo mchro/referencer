@@ -267,19 +267,19 @@ int DocumentList::import (
 	BibUtils::Format format)
 {
 	if (format == BibUtils::FORMAT_UNKNOWN)
-		format = BibUtils::guessFormat (rawtext);
+		format = (BibUtils::Format) BIBL_BIBTEXIN;
 
 	BibUtils::param p;
 
 	BibUtils::bibl b;
 	BibUtils::bibl_init( &b );
 	// BIBL_* are #defines, so not in namespace
-	BibUtils::bibl_initparams( &p, format, BIBL_MODSOUT);
+	BibUtils::bibl_initparams( &p, format, BIBL_MODSOUT, BibUtils::progname);
 	p.charsetin = BIBL_CHARSET_UNICODE;
 	p.utf8in = 1;
 
 	try {
-		BibUtils::biblFromString (b, rawtext, format, p);
+		BibUtils::biblFromString (b, rawtext, p);
 	} catch (Glib::Error& ex) {
 		BibUtils::bibl_free( &b );
 		Utility::exceptionDialog (&ex, _("Parsing import"));
@@ -287,7 +287,7 @@ int DocumentList::import (
 	}
 
 	// Make a copy to return after we free b	
-	int const nrefs = b.nrefs;
+	int const nrefs = b.n;
 	
 	for (int i = 0; i < nrefs; ++i) {
 		try {

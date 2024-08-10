@@ -886,12 +886,12 @@ bool Document::parseBibtex (Glib::ustring const &bibtex)
 	BibUtils::param p;
 	BibUtils::bibl b;
 	BibUtils::bibl_init( &b );
-	BibUtils::bibl_initparams( &p, BibUtils::FORMAT_BIBTEX, BIBL_MODSOUT);
+	BibUtils::bibl_initparams( &p, BibUtils::FORMAT_BIBTEX, BIBL_MODSOUT, BibUtils::progname);
 
 	try {
 		/* XXX should convert this to latin1? */
-		BibUtils::biblFromString (b, bibtex, BibUtils::FORMAT_BIBTEX, p);
-		if (b.nrefs != 1)
+		BibUtils::biblFromString (b, bibtex, p);
+		if (b.n != 1)
 			return false;
 
 		Document newdoc = BibUtils::parseBibUtils (b.ref[0]);

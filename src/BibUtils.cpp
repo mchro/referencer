@@ -20,10 +20,7 @@ extern "C" {
 
 namespace BibUtils {
 
-char progname[] = "referencer";
-
-lists asis  = { 0, 0, NULL };
-lists corps = { 0, 0, NULL };
+char *progname = "referencer";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,15 +48,16 @@ enum {
 static int
 bibtexout_type( fields *info)
 {
-	char *genre;
+	const char *genre;
 	int type = TYPE_UNKNOWN, i, maxlevel, level;
 
 	/* determine bibliography type */
-	for ( i=0; i<info->nfields; ++i ) {
-		if ( strcasecmp( info->tag[i].data, "GENRE" ) &&
-		     strcasecmp( info->tag[i].data, "NGENRE" ) ) continue;
-		genre = info->data[i].data;
-		level = info->level[i];
+	for ( i=0; i < fields_num(info); ++i ) {
+
+		if ( strcasecmp( (const char *)fields_tag(info, i, 0), "GENRE" ) &&
+		     strcasecmp( (const char *)fields_tag(info, i, 0), "NGENRE" ) ) continue;
+		genre = (const char *) fields_value(info, i, 0);
+		level = fields_level(info, i);
 		if ( !strcasecmp( genre, "periodical" ) ||
 		     !strcasecmp( genre, "academic journal" ) ||
 		     !strcasecmp( genre, "magazine" ) )
@@ -87,11 +85,11 @@ bibtexout_type( fields *info)
 			type = TYPE_MASTERSTHESIS;
 	}
 	if ( type==TYPE_UNKNOWN ) {
-		for ( i=0; i<info->nfields; ++i ) {
-			if ( strcasecmp( info->tag[i].data, "ISSUANCE" ) ) continue;
-			if ( !strcasecmp( info->data[i].data, "monographic" ) ) {
-				if ( info->level[i]==0 ) type = TYPE_BOOK;
-				else if ( info->level[i]==1 ) type=TYPE_INBOOK;
+		for ( i=0; i < fields_num(info); ++i ) {
+			if ( strcasecmp( (const char *)fields_tag(info, i, 0), "ISSUANCE" ) ) continue;
+			if ( !strcasecmp( (const char *)fields_value(info, i, 0), "monographic" ) ) {
+				if ( fields_level(info, i) == 0 ) type = TYPE_BOOK;
+				else if ( fields_level(info, i) == 1 ) type=TYPE_INBOOK;
 			}
 		}
 	}
@@ -165,12 +163,10 @@ std::string formatTitle (BibUtils::fields *ref, int level)
 	std::string title;
 
 	if (kmain >= 0) {
-		title = ref->data[kmain].data;
-		ref->used[kmain] = 1;
+		title = (const char *) fields_value(ref, kmain, FIELDS_SETUSE_FLAG);
 		if (ksub >= 0) {
 			title += ": ";
-			title += std::string (ref->data[ksub].data);
-			ref->used[ksub] = 1;
+			title += std::string ( (const char *) fields_value(ref, ksub, FIELDS_SETUSE_FLAG));
 		}
 	}
 
@@ -208,18 +204,18 @@ std::string formatPeople(fields *info, char *tag, char *ctag, int level)
 
 	/* primary citation authors */
 	npeople = 0;
-	for ( i=0; i<info->nfields; ++i ) {
-		if ( level!=-1 && info->level[i]!=level ) continue;
-		person = ( strcasecmp( info->tag[i].data, tag ) == 0 );
-		corp   = ( strcasecmp( info->tag[i].data, ctag ) == 0 );
+	for ( i=0; i < fields_num(info); ++i ) {
+		if ( level!=-1 && fields_level(info, i)!=level ) continue;
+		person = ( strcasecmp( (const char *)fields_tag(info, i, 0), tag ) == 0 );
+		corp   = ( strcasecmp( (const char *)fields_tag(info, i, 0), ctag ) == 0 );
 		if ( person || corp ) {
 			if (npeople > 0)
 				output += " and ";
 
 			if (corp)
-				output += std::string (info->data[i].data);
+				output += std::string ((const char *)fields_value(info, i, 0));
 			else
-				output += formatPerson (info->data[i].data);
+				output += formatPerson ((const char *)fields_value(info, i, 0));
 
 			npeople++;
 		}
@@ -287,9 +283,9 @@ Document parseBibUtils (BibUtils::fields *ref)
 		newdoc.getBibData().addExtra ("Translator", translators);
 	}
 
-	for (int j = 0; j < ref->nfields; ++j) {
-		std::string key = ref->tag[j].data;
-		std::string value = ref->data[j].data;
+	for (int j = 0; j < fields_num(ref); ++j) {
+		std::string key = (const char *)fields_tag(ref, j, 0);
+		std::string value = (const char *)fields_value(ref, j, 0);
 
 		int used = 1;
 		if (key == "REFNUM") {
@@ -315,9 +311,9 @@ Document parseBibUtils (BibUtils::fields *ref)
 			used = 0;
 		}
 		if (used)
-			ref->used[j] = 1;
+			fields_set_used(ref, j);
 
-		if (!ref->used[j]) {
+		if (!fields_used(ref, j)) {
 			if (key == "TITLE") {
 				if (type == TYPE_INCOLLECTION) {
 					// Special case: Chapters in InCollection get added as "Title" level 0
@@ -327,7 +323,7 @@ Document parseBibUtils (BibUtils::fields *ref)
 					key = "Series";
 				} else {
 					DEBUG ("unexpected TITLE element %1:%2 (%3)",
-						key, value, ref->level[j]);
+						key, value, fields_level(ref, j));
 					// Don't overwrite existing title field
 					if (!newdoc.getBibData().getTitle().empty()) {
 						continue;
@@ -349,12 +345,6 @@ Document parseBibUtils (BibUtils::fields *ref)
 
 
 	return newdoc;
-}
-
-
-Format guessFormat (std::string const &rawtext)
-{
-	return (Format) BIBL_BIBTEXIN;
 }
 
 static void writerThread (std::string const &raw, int pipe, volatile bool *advance)
@@ -386,7 +376,6 @@ static void writerThread (std::string const &raw, int pipe, volatile bool *advan
 void biblFromString (
 	bibl &b,
 	std::string const &rawtext,
-	Format format,
 	param &p
 	)
 {
@@ -408,7 +397,7 @@ void biblFromString (
 
 	FILE *otherend = fdopen (pipeout, "r");
 	std::string strfakefilename = "My Pipe";
-	BibUtils::bibl_read(&b, otherend, &strfakefilename[0], format, &p );
+	BibUtils::bibl_read(&b, otherend, &strfakefilename[0], &p );
 	fclose (otherend);
 	close (pipeout);
 
