@@ -40,7 +40,6 @@ config_h.set_quoted('GETTEXT_PACKAGE', referencer_name)
 config_h.set('ENABLE_NLS', true)
 
 
-#gtkmm2_dep = dependency('gtkmm-2.4')
 gtkmm3_dep = dependency('gtkmm-3.0')
 python2_dep = dependency('python2')
 libxml_dep = dependency('libxml-2.0')
@@ -49,7 +48,6 @@ boost_regex_dep = dependency('boost', modules: ['regex'])
 bibutils_dep = dependency('bibutils')
 
 deps = [
-  #gtkmm2_dep,
   gtkmm3_dep,
   python2_dep,
   libxml_dep,

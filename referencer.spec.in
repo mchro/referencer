@@ -10,14 +10,8 @@ BuildRoot: %{_builddir}/%{name}
 # no debug package
 %define debug_package %{nil}
 
-Requires: gtkmm24
-Requires: libgnomeuimm26
-Requires: gnome-vfsmm26
+Requires: gtkmm3
 Requires: poppler
-Requires: libgnomemm26
-Requires: libgnomeuimm26
-Requires: gconfmm26
-Requires: libglademm24
 
 %description
 A document organiser and bibliography manager for GNOME.
