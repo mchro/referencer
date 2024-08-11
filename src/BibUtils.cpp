@@ -294,11 +294,11 @@ Document parseBibUtils (BibUtils::fields *ref)
 			newdoc.getBibData().setVolume (value);
 		} else if (key == "NUMBER" || key == "ISSUE") {
 			newdoc.getBibData().setIssue (value);
-		} else if (key == "YEAR" || key == "PARTYEAR") {
+		} else if (key == "YEAR" || key == "PARTYEAR" || key == "PARTDATE:YEAR") {
 			newdoc.getBibData().setYear (value);
-		} else if (key == "PAGESTART") {
+		} else if (key == "PAGESTART" || key == "PAGES:START") {
 			newdoc.getBibData().setPages (value + newdoc.getBibData().getPages ());
-		} else if (key == "PAGEEND") {
+		} else if (key == "PAGEEND" || key == "PAGES:STOP") {
 			newdoc.getBibData().setPages (newdoc.getBibData().getPages () + "-" + value);
 		} else if (key == "ARTICLENUMBER") {
 			/* bibtex normally avoid article number, so output as page */
