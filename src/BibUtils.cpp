@@ -20,7 +20,7 @@ extern "C" {
 
 namespace BibUtils {
 
-char *progname = "referencer";
+char *progname = const_cast<char*>("referencer");
 
 #include <stdio.h>
 #include <stdlib.h>
