@@ -49,8 +49,6 @@ src/PythonPlugin.C
 src/PythonPlugin.h
 src/RefWindow.C
 src/RefWindow.h
-src/sexy-enum-types.h
-src/sexy-icon-entry.h
 src/TagList.C
 src/TagList.h
 src/ThumbnailGenerator.C

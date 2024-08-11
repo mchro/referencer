@@ -19,7 +19,6 @@
 
 #include "Document.h"
 #include "DocumentList.h"
-#include "icon-entry.h"
 #include "Library.h"
 #include "Linker.h"
 #include "Preferences.h"

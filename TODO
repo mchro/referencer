@@ -86,7 +86,6 @@ Functionality wishlist:
 	Where we use ".tmp" in writing files, we should use something more unique
 	Do something with PDF-embedded metadata if there is any
 	Assign a color to a tag and highlight refs with it
-	Use installed libsexy if available, a la rhythmbox
 	Resolve symlinks before doing relative filename magic
 
 UI wishlist:
