@@ -58,6 +58,9 @@ deps = [
 
 top_inc = include_directories('./src')
 
+i18n = import('i18n')
+subdir('po')
+
 referencer_localedir = join_paths(referencer_prefix, get_option('localedir'))
 cflags = [
   '-DGNOMELOCALEDIR="@0@"'.format(referencer_localedir),
