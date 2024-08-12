@@ -54,8 +54,8 @@ bibtexout_type( fields *info)
 	/* determine bibliography type */
 	for ( i=0; i < fields_num(info); ++i ) {
 
-		if ( strcasecmp( (const char *)fields_tag(info, i, 0), "GENRE" ) &&
-		     strcasecmp( (const char *)fields_tag(info, i, 0), "NGENRE" ) ) continue;
+		if ( strcasecmp( (const char *)fields_tag(info, i, 0), "GENRE:MARC" ) &&
+		     strcasecmp( (const char *)fields_tag(info, i, 0), "GENRE:BIBUTILS" ) ) continue;
 		genre = (const char *) fields_value(info, i, 0);
 		level = fields_level(info, i);
 		if ( !strcasecmp( genre, "periodical" ) ||
@@ -303,9 +303,11 @@ Document parseBibUtils (BibUtils::fields *ref)
 		} else if (key == "ARTICLENUMBER") {
 			/* bibtex normally avoid article number, so output as page */
 			newdoc.getBibData().setPages (value);
-		} else if (key == "RESOURCE" || key == "ISSUANCE" || key == "GENRE"
+		} else if (key == "ORGANIZER:CORP") {
+			newdoc.getBibData().addExtra ("organization", value);
+		} else if (key == "RESOURCE" || key == "ISSUANCE" || key == "GENRE:MARC"
 		        || key == "AUTHOR" || key == "EDITOR" || key == "CORPAUTHOR"
-		        || key == "CORPEDITOR" || key == "TYPE") {
+		        || key == "CORPEDITOR" || key == "TYPE" || key == "INTERNAL_TYPE") {
 			// Don't add them as "extra fields"
 		} else {
 			used = 0;
