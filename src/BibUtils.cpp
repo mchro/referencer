@@ -240,8 +240,8 @@ std::string formatPeople(fields *info, char *tag, char *ctag, int level)
 Document parseBibUtils (BibUtils::fields *ref)
 {
 	std::pair<std::string,std::string> a[]={
-		std::make_pair("PARTDAY", "Day"),
-		std::make_pair("PARTMONTH", "Month"),
+		std::make_pair("PARTDATE:DAY", "Day"),
+		std::make_pair("PARTDATE:MONTH", "Month"),
 		std::make_pair("KEYWORD", "Keywords"),
 		std::make_pair("DEGREEGRANTOR", "School"),
 		std::make_pair("DEGREEGRANTOR:ASIS", "School"),
@@ -294,11 +294,11 @@ Document parseBibUtils (BibUtils::fields *ref)
 			newdoc.getBibData().setVolume (value);
 		} else if (key == "NUMBER" || key == "ISSUE") {
 			newdoc.getBibData().setIssue (value);
-		} else if (key == "YEAR" || key == "PARTYEAR" || key == "PARTDATE:YEAR") {
+		} else if (key == "YEAR" || key == "PARTDATE:YEAR") {
 			newdoc.getBibData().setYear (value);
-		} else if (key == "PAGESTART" || key == "PAGES:START") {
+		} else if (key == "PAGES:START") {
 			newdoc.getBibData().setPages (value + newdoc.getBibData().getPages ());
-		} else if (key == "PAGEEND" || key == "PAGES:STOP") {
+		} else if (key == "PAGES:STOP") {
 			newdoc.getBibData().setPages (newdoc.getBibData().getPages () + "-" + value);
 		} else if (key == "ARTICLENUMBER") {
 			/* bibtex normally avoid article number, so output as page */
