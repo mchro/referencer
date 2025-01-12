@@ -34,15 +34,15 @@ referencer_download(PyObject *self, PyObject *args)
 	PyObject *ret = NULL;
 	try {
 		Glib::ustring &xml = Transfer::readRemoteFile (
-			PyString_AsString(title),
-			PyString_AsString(message),
-			PyString_AsString(url));
-		ret = PyString_FromString (xml.c_str());
+			PyUnicode_AsUTF8(title),
+			PyUnicode_AsUTF8(message),
+			PyUnicode_AsUTF8(url));
+		ret = PyUnicode_FromString (xml.c_str());
 		DEBUG ("got %1 characters", xml.length());
 	} catch (Transfer::Exception& ex) {
 		Utility::exceptionDialog (&ex, _("Downloading metadata"));
 		Glib::ustring blank;
-		ret = PyString_FromString (blank.c_str());
+		ret = PyUnicode_FromString (blank.c_str());
 		
 	}
 
@@ -58,7 +58,7 @@ referencer_bibtex_to_fields (PyObject *self, PyObject *args)
 {
 	/* Get bibtex string from argument tuple */
 	PyObject *bibtex_py_str = PyTuple_GetItem (args, 0);
-	char *bibtex_str = PyString_AsString(bibtex_py_str);
+	const char *bibtex_str = PyUnicode_AsUTF8(bibtex_py_str);
 
 	/* Parse bibtex into a Document */
 	Document doc;
@@ -75,8 +75,8 @@ referencer_bibtex_to_fields (PyObject *self, PyObject *args)
 	for (; fieldIter != fieldEnd; ++fieldIter) {
 		PyDict_SetItem (
 			dict,
-			PyString_FromString (fieldIter->first.c_str()),
-			PyString_FromString (fieldIter->second.c_str()));
+			PyUnicode_FromString (fieldIter->first.c_str()),
+			PyUnicode_FromString (fieldIter->second.c_str()));
 	}
 
 	return dict;
@@ -87,7 +87,7 @@ static PyObject*
 referencer_gettext(PyObject *self, PyObject *args)
 {
 	PyObject *str = PyTuple_GetItem (args, 0);
-	return PyString_FromString (_(PyString_AsString(str)));
+	return PyUnicode_FromString (_(PyUnicode_AsUTF8(str)));
 }
 
 
@@ -97,7 +97,7 @@ referencer_pref_set (PyObject *self, PyObject *args)
 	PyObject *key = PyTuple_GetItem (args, 0);
 	PyObject *value = PyTuple_GetItem (args, 1);
 
-	_global_prefs->setPluginPref (PyString_AsString(key), PyString_AsString(value));
+	_global_prefs->setPluginPref (PyUnicode_AsUTF8(key), PyUnicode_AsUTF8(value));
 
 	return Py_True;
 }
@@ -107,8 +107,8 @@ static PyObject*
 referencer_pref_get (PyObject *self, PyObject *args)
 {
 	PyObject *key = PyTuple_GetItem (args, 0);
-	Glib::ustring value = _global_prefs->getPluginPref (PyString_AsString(key));
-	return PyString_FromString (value.c_str());
+	Glib::ustring value = _global_prefs->getPluginPref (PyUnicode_AsUTF8(key));
+	return PyUnicode_FromString (value.c_str());
 }
 
 
@@ -153,9 +153,18 @@ static PyMethodDef ReferencerMethods[] = {
 };
 
 
+static struct PyModuleDef ReferencerModule = {
+    PyModuleDef_HEAD_INIT,
+    "referencer",        // Module name
+    NULL,                // Module documentation (can be NULL)
+    -1,                  // Size of per-interpreter state (or -1 if state is global)
+    ReferencerMethods    // Methods of the module
+};
+
+
 PluginManager::PluginManager ()
 {
-	PyObject *module = Py_InitModule ("referencer", ReferencerMethods);
+	PyObject *module = PyModule_Create(&ReferencerModule);
 
 	PyType_Ready (&t_referencer_document);
 	PyObject_SetAttrString (module, "document", (PyObject*)&t_referencer_document);

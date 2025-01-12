@@ -41,7 +41,7 @@ config_h.set('ENABLE_NLS', true)
 
 
 gtkmm3_dep = dependency('gtkmm-3.0')
-python2_dep = dependency('python2')
+python3_dep = dependency('python3-embed')
 libxml_dep = dependency('libxml-2.0')
 poppler_dep = dependency('poppler-glib')
 boost_regex_dep = dependency('boost', modules: ['regex'])
@@ -49,7 +49,7 @@ bibutils_dep = dependency('bibutils')
 
 deps = [
   gtkmm3_dep,
-  python2_dep,
+  python3_dep,
   libxml_dep,
   poppler_dep,
   boost_regex_dep,

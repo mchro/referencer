@@ -12,14 +12,14 @@
 static PyObject *referencer_document_get_key (PyObject *self, PyObject *args)
 {
 	Glib::ustring value = ((referencer_document*)self)->doc_->getKey ();
-	return PyString_FromString(value.c_str());
+	return PyUnicode_FromString(value.c_str());
 }
 
 
 static PyObject *referencer_document_set_key (PyObject *self, PyObject *args)
 {
 	PyObject *value = PyTuple_GetItem (args, 0);
-	((referencer_document*)self)->doc_->setKey (PyString_AsString(value));
+	((referencer_document*)self)->doc_->setKey (PyUnicode_AsUTF8(value));
 	return Py_BuildValue ("i", 0);
 }
 
@@ -27,28 +27,28 @@ static PyObject *referencer_document_set_key (PyObject *self, PyObject *args)
 static PyObject *referencer_document_get_filename (PyObject *self, PyObject *args)
 {
 	Glib::ustring value = ((referencer_document*)self)->doc_->getFileName ();
-	return PyString_FromString(value.c_str());
+	return PyUnicode_FromString(value.c_str());
 }
 
 
 static PyObject *referencer_document_set_filename (PyObject *self, PyObject *args)
 {
 	PyObject *value = PyTuple_GetItem (args, 0);
-	((referencer_document*)self)->doc_->setFileName (PyString_AsString(value));
+	((referencer_document*)self)->doc_->setFileName (PyUnicode_AsUTF8(value));
 	return Py_BuildValue ("i", 0);
 }
 
 static PyObject *referencer_document_get_notes(PyObject *self, PyObject *args)
 {
 	Glib::ustring value = ((referencer_document*)self)->doc_->getNotes ();
-	return PyString_FromString(value.c_str());
+	return PyUnicode_FromString(value.c_str());
 }
 
 
 static PyObject *referencer_document_set_notes (PyObject *self, PyObject *args)
 {
 	PyObject *value = PyTuple_GetItem (args, 0);
-	((referencer_document*)self)->doc_->setNotes (PyString_AsString(value));
+	((referencer_document*)self)->doc_->setNotes (PyUnicode_AsUTF8(value));
 	return Py_BuildValue ("i", 0);
 }
 
@@ -57,7 +57,7 @@ static PyObject *referencer_document_get_type (PyObject *self, PyObject *args)
 {
 	try {
 		Glib::ustring value = ((referencer_document*)self)->doc_->getBibData().getType();
-		return PyString_FromString(value.c_str());
+		return PyUnicode_FromString(value.c_str());
 	} catch (std::exception &ex) {
 		PyErr_SetString (PyExc_KeyError, ex.what());
         Py_INCREF(Py_None);
@@ -68,7 +68,7 @@ static PyObject *referencer_document_get_type (PyObject *self, PyObject *args)
 static PyObject *referencer_document_set_type (PyObject *self, PyObject *args)
 {
 	PyObject *value = PyTuple_GetItem (args, 0);
-	((referencer_document*)self)->doc_->getBibData().setType (PyString_AsString(value));
+	((referencer_document*)self)->doc_->getBibData().setType (PyUnicode_AsUTF8(value));
 	return Py_BuildValue ("i", 0);
 }
 
@@ -78,8 +78,8 @@ static PyObject *referencer_document_get_field (PyObject *self, PyObject *args)
 	PyObject *fieldName = PyTuple_GetItem (args, 0);
 
 	try {
-		Glib::ustring value = ((referencer_document*)self)->doc_->getField (PyString_AsString(fieldName));
-		return PyString_FromString(value.c_str());
+		Glib::ustring value = ((referencer_document*)self)->doc_->getField (PyUnicode_AsUTF8(fieldName));
+		return PyUnicode_FromString(value.c_str());
 	}
 	catch (std::range_error &ex) { /* unknown field */
 		Py_INCREF(Py_None);
@@ -107,7 +107,7 @@ static PyObject *referencer_document_set_field (PyObject *self, PyObject *args)
 {
 	PyObject *fieldName = PyTuple_GetItem (args, 0);
 	PyObject *value = PyTuple_GetItem (args, 1);
-	((referencer_document*)self)->doc_->setField (PyString_AsString(fieldName), PyString_AsString(value));
+	((referencer_document*)self)->doc_->setField (PyUnicode_AsUTF8(fieldName), PyUnicode_AsUTF8(value));
 	return Py_BuildValue ("i", 0);
 }
 
@@ -115,7 +115,7 @@ static PyObject *referencer_document_set_field (PyObject *self, PyObject *args)
 static PyObject *referencer_document_parse_bibtex (PyObject *self, PyObject *args)
 {
 	PyObject *bibtex = PyTuple_GetItem (args, 0);
-	((referencer_document*)self)->doc_->parseBibtex (PyString_AsString(bibtex));
+	((referencer_document*)self)->doc_->parseBibtex (PyUnicode_AsUTF8(bibtex));
 	return Py_BuildValue ("i", 0);
 }
 
@@ -131,7 +131,7 @@ static PyObject *referencer_document_print_bibtex (PyObject *self, PyObject *arg
 
 	/* Convert for output */
 	/* FIXME: will this work with utf8 true? */
-	return PyString_FromString (bibtex.c_str());
+	return PyUnicode_FromString (bibtex.c_str());
 }
 
 static void referencer_document_dealloc (PyObject *self)
@@ -141,7 +141,7 @@ static void referencer_document_dealloc (PyObject *self)
 
 static PyObject *referencer_document_string (PyObject *self)
 {
-	return PyString_FromString ("Referencer object representing a single document");
+	return PyUnicode_FromString ("Referencer object representing a single document");
 }
 
 static int referencer_document_init (PyObject *self, PyObject *args, PyObject *kwds)
@@ -176,17 +176,16 @@ static PyMethodDef referencer_document_methods[] = {
 };
 
 PyTypeObject t_referencer_document = {
-	PyObject_HEAD_INIT(NULL)
-	0,
+	PyVarObject_HEAD_INIT(NULL, 0)
 	"referencer.document",
 	sizeof (referencer_document),
 	0,
-	referencer_document_dealloc,
+	(destructor)referencer_document_dealloc,
 	0,
 	0,
 	0,
 	0,
-	referencer_document_string,
+	(reprfunc)referencer_document_string,
 	0,
 	0,
 	0,
@@ -212,8 +211,8 @@ PyTypeObject t_referencer_document = {
 	0,
 	0,
 	0,
-	referencer_document_init,
+	(initproc)referencer_document_init,
 	PyType_GenericAlloc,
 	PyType_GenericNew,
-	_PyObject_Del
+	PyObject_Del
 };

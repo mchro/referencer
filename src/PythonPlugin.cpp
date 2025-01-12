@@ -49,10 +49,10 @@ void freeString (void *data)
 /* Convenience function for sometimes-present items */
 Glib::ustring safePyDictGetItem (PyObject *dict, Glib::ustring const &key)
 {
-	PyObject *keyStr = PyString_FromString (key.c_str());
+	PyObject *keyStr = PyUnicode_FromString (key.c_str());
 	if (PyDict_Contains (dict, keyStr)) {
 		Py_DECREF (keyStr);
-		return PyString_AsString (PyDict_GetItemString (dict, key.c_str()));
+		return PyUnicode_AsUTF8 (PyDict_GetItemString (dict, key.c_str()));
 	} else {
 		Py_DECREF (keyStr);
 		return Glib::ustring ();
@@ -65,7 +65,7 @@ void PythonPlugin::load (std::string const &moduleName)
 	/* XXX this gets called before we're in the main event loop, so we can't use 
 	 * displayException in the error cases here */
 	moduleName_ = moduleName;
-	PyObject *pName = PyString_FromString(moduleName.c_str());
+	PyObject *pName = PyUnicode_FromString(moduleName.c_str());
 	if (!pName) {
 		printException ();
 		DEBUG ("Plugin::load: Couldn't construct module name");
@@ -101,7 +101,7 @@ void PythonPlugin::load (std::string const &moduleName)
 		int const N = PyList_Size (pCaps);
 		for (int i = 0; i < N; ++i) {
 			PyObject *pCapabilityString = PyList_GetItem (pCaps, i);
-			char *const cstr = PyString_AsString (pCapabilityString);
+			const char * cstr = PyUnicode_AsUTF8 (pCapabilityString);
 			Glib::ustring str;
 
 			if (cstr)
@@ -353,9 +353,9 @@ Glib::ustring PythonPlugin::formatException ()
 
 		PyObject *pStr;
 		pStr = PyObject_Str (ptype);
-		Glib::ustring const exType = PyString_AsString (pStr);
+		Glib::ustring const exType = PyUnicode_AsUTF8 (pStr);
 		pStr = PyObject_Str (pvalue);
-		Glib::ustring const exValue = PyString_AsString (pStr);
+		Glib::ustring const exValue = PyUnicode_AsUTF8 (pStr);
 
 		Glib::ustring message = String::ucompose (
 			_("%1: %2\n\n%3: %4\n%5: %6\n"),
@@ -393,9 +393,9 @@ void PythonPlugin::displayException ()
 
 		PyObject *pStr;
 		pStr = PyObject_Str (ptype);
-		Glib::ustring const exType = PyString_AsString (pStr);
+		Glib::ustring const exType = PyUnicode_AsUTF8 (pStr);
 		pStr = PyObject_Str (pvalue);
-		Glib::ustring const exValue = PyString_AsString (pStr);
+		Glib::ustring const exValue = PyUnicode_AsUTF8 (pStr);
 
 		Glib::ustring message = String::ucompose (
 			_("<big><b>%1: %2</b></big>\n\n%3: %4\n%5: %6"),
@@ -501,11 +501,11 @@ Glib::ustring const PythonPlugin::getPluginInfoField (Glib::ustring const &targe
 	if (!loaded_)
 		return Glib::ustring ();
 
-	PyObject *keyStr = PyString_FromString (targetKey.c_str());
+	PyObject *keyStr = PyUnicode_FromString (targetKey.c_str());
 	if (PyDict_Contains (pPluginInfo_, keyStr)) {
 		Py_DECREF (keyStr);
 		return Glib::ustring (
-			PyString_AsString (
+			PyUnicode_AsUTF8 (
 				PyDict_GetItemString(
 					pPluginInfo_,
 					targetKey.c_str())));
@@ -594,7 +594,7 @@ Plugin::SearchResults PythonPlugin::doSearch (Glib::ustring const &searchTerms)
 			PyObject *key, *value;
 			Py_ssize_t pos = 0;
 			while (PyDict_Next(dict, &pos, &key, &value)) {
-				result[PyString_AsString(key)] = PyString_AsString(value);
+				result[PyUnicode_AsUTF8(key)] = PyUnicode_AsUTF8(value);
 			}
 
 			retval.push_back(result);
@@ -637,8 +637,8 @@ Document PythonPlugin::getSearchResult (Glib::ustring const &token)
 		PyObject *key, *value;
 		Py_ssize_t pos = 0;
 		while (PyDict_Next(dict, &pos, &key, &value)) {
-			DEBUG ("Setting %1 %2", PyString_AsString(key), PyString_AsString(value));
-			doc.setField (PyString_AsString(key), PyString_AsString(value));
+			DEBUG ("Setting %1 %2", PyUnicode_AsUTF8(key), PyUnicode_AsUTF8(value));
+			doc.setField (PyUnicode_AsUTF8(key), PyUnicode_AsUTF8(value));
 		}
 
 		Py_DECREF (pReturn);
