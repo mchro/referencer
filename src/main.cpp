@@ -74,7 +74,6 @@ int main (int argc, char **argv)
 	/* Export the path */
 	DEBUG ("setting pythonPath to %1", pythonPath);
 	setenv ("PYTHONPATH", pythonPath.c_str(), 1);
-	Py_Initialize ();
 
 	_global_plugins = new PluginManager ();
 	_global_plugins->scan("./plugins");

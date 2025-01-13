@@ -437,7 +437,8 @@ void Preferences::onPluginConfigure ()
  */
 void Preferences::setPluginPref (Glib::ustring const &key, Glib::ustring const &value)
 {
-	m_settings->set_string("plugin-" + key, value);
+	//TODO: allowing arbitrary plugin prefs is a larger task
+	//m_settings->set_string("plugin-" + key, value);
 }
 
 

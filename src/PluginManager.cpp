@@ -154,20 +154,48 @@ static PyMethodDef ReferencerMethods[] = {
 
 
 static struct PyModuleDef ReferencerModule = {
-    PyModuleDef_HEAD_INIT,
-    "referencer",        // Module name
-    NULL,                // Module documentation (can be NULL)
-    -1,                  // Size of per-interpreter state (or -1 if state is global)
-    ReferencerMethods    // Methods of the module
+	PyModuleDef_HEAD_INIT,
+	"referencer",		// Module name
+	NULL,				// Module documentation (can be NULL)
+	-1,				  // Size of per-interpreter state (or -1 if state is global)
+	ReferencerMethods	// Methods of the module
 };
 
+PyMODINIT_FUNC PyInit_referencer(void)
+{
+	return PyModule_Create(&ReferencerModule);
+}
 
 PluginManager::PluginManager ()
 {
-	PyObject *module = PyModule_Create(&ReferencerModule);
+
+	PyStatus status;
+	PyConfig config;
+	PyConfig_InitPythonConfig(&config);
+
+	/* Add a built-in module, before Py_Initialize */
+	if (PyImport_AppendInittab("referencer", PyInit_referencer) == -1) {
+		fprintf(stderr, "Error: could not extend in-built modules table\n");
+		exit(1);
+	}
+
+	/* Initialize the Python interpreter.  Required.
+	   If this step fails, it will be a fatal error. */
+	status = Py_InitializeFromConfig(&config);
+	if (PyStatus_Exception(status)) {
+		//goto exception;
+	}
+	PyConfig_Clear(&config);
+
+	/* Import the module */
+	PyObject *pmodule = PyImport_ImportModule("referencer");
+	if (!pmodule) {
+		PyErr_Print();
+		fprintf(stderr, "Error: could not import module 'referencer'\n");
+	}
 
 	PyType_Ready (&t_referencer_document);
-	PyObject_SetAttrString (module, "document", (PyObject*)&t_referencer_document);
+	PyObject_SetAttrString (pmodule, "document", (PyObject*)&t_referencer_document);
 
 	progressCallback_ = NULL;
 }
