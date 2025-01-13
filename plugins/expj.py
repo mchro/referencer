@@ -32,7 +32,7 @@ expj_journaldb_ordered.txt expj_journaldb.txt
 
 import os
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import gtk  # for dialogs
 import string  # for string handling
@@ -134,11 +134,11 @@ def do_expand(library, documents):
             sv = shortv.strip().lower()
             try:
                 # try direct lookup in database
-                idx = map(string.lower, contracted).index(sv)
+                idx = list(map(string.lower, contracted)).index(sv)
                 repl = expanded[idx]
             except ValueError:
                 try:  # check if journal name is already the expanded version
-                    idx = map(string.lower, expanded).index(sv)
+                    idx = list(map(string.lower, expanded)).index(sv)
                     if idx:
                         continue
                 except:
@@ -242,8 +242,8 @@ def do_expand(library, documents):
             # change the journal name
             doc.set_field('journal', repl)
             if DEBUG:
-                print("expj: changed journal entry from '%s' to '%s'"
-                      % (shortv, repl))
+                print(("expj: changed journal entry from '%s' to '%s'"
+                      % (shortv, repl)))
 
     return True
 
@@ -264,11 +264,11 @@ def do_shorten(library, documents):
         if longv != "":
             lv = longv.strip().lower()
             try:  # look for exact match in database
-                idx = map(string.lower, expanded).index(lv)
+                idx = list(map(string.lower, expanded)).index(lv)
                 repl = contracted[idx]
             except ValueError:
                 try:  # check if journal name is already the shortened version
-                    idx = map(string.lower, contracted).index(lv)
+                    idx = list(map(string.lower, contracted)).index(lv)
                     if idx:
                         continue
                 except:
@@ -372,8 +372,8 @@ def do_shorten(library, documents):
             # change the journal name
             doc.set_field('journal', repl)
             if DEBUG:
-                print("expj: changed journal entry from '%s' to '%s'"
-                      % (longv, repl))
+                print(("expj: changed journal entry from '%s' to '%s'"
+                      % (longv, repl)))
 
     return True
 
@@ -393,8 +393,8 @@ def load_db():
                         expanded.append(longv.strip())
                         contracted.append(shortv.strip())
                     elif DEBUG:
-                        print("expj: unparsable line in Journal name database "
-                              "(%s)" % line.strip())
+                        print(("expj: unparsable line in Journal name database "
+                              "(%s)" % line.strip()))
             DISPHINT = False  # at least one file was loaded so remove the hint
         except IOError:
             pass
@@ -416,8 +416,8 @@ def save_db():
             fh.write(newentry + '\n')
     except IOError:
         if DEBUG:
-            print("expj: changes to Journal name database could not be "
-                  "written! (File: %s)" % DBs[0])
+            print(("expj: changes to Journal name database could not be "
+                  "written! (File: %s)" % DBs[0]))
 
 
 def download_db(link):
@@ -438,9 +438,9 @@ def download_db(link):
             sys.stdout.flush()
 
     if DEBUG:
-        print("expj: Download link '%s'" % link)
+        print(("expj: Download link '%s'" % link))
     try:
-        filename, headers = urllib.urlretrieve(link, reporthook=dlProgress)
+        filename, headers = urllib.request.urlretrieve(link, reporthook=dlProgress)
     except IOError as err:
         downloadException(err.strerror)
         return
@@ -468,8 +468,8 @@ def download_db(link):
         for line in validlines:
             fh.write(line)
     if DEBUG:
-        print("expj: written %d entries into Journal name database!"
-              % len(validlines))
+        print(("expj: written %d entries into Journal name database!"
+              % len(validlines)))
     # clean old databases to trigger reload upon next usage
     expanded = []
     contracted = []

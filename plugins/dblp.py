@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 try:
     import referencer
     from referencer import _
@@ -135,8 +135,8 @@ def resolve_metadata (doc, method=None):
     
     #print "DBLP:searchTerm:", repr(searchTerm)
 
-    url = "http://www.dblp.org/search/api/?%s&h=1000&c=0&f=0&format=xml" % (urllib.urlencode({'q': searchTerm}))
-    print "DBLP:url:", repr(url)
+    url = "http://www.dblp.org/search/api/?%s&h=1000&c=0&f=0&format=xml" % (urllib.parse.urlencode({'q': searchTerm}))
+    print("DBLP:url:", repr(url))
     data = referencer.download (_("Searching DBLP"), _("Fetching metadata from DBLP for search query '%s'") % searchTerm, url);
 
     if not data:
@@ -144,10 +144,10 @@ def resolve_metadata (doc, method=None):
 
     hits = parse_hits_get_urls(data)
 
-    print "DBLP:hits:", hits
+    print("DBLP:hits:", hits)
     if len(hits) != 1:
         #XXX, display UI?
-        print "DBLP: Not exactly one hit, giving up"
+        print("DBLP: Not exactly one hit, giving up")
         return False
 
     bibtex_xml = get_bibtex_xml_from_url(hits[0])

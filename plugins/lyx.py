@@ -73,7 +73,7 @@ for dir in os.environ['PATH'].split (os.pathsep):
 	exe = os.path.join (dir, "lyxclient")
 	if (os.path.exists(exe)):
 		lyxClientBinary = exe
-		print "\tFound lyxclient at %s\n" % exe
+		print("\tFound lyxclient at %s\n" % exe)
 		break
 
 
@@ -98,13 +98,13 @@ def do_cite (library, documents):
 
 	if existing_lyxpipe is not None:	
 		try:
-			print "using lyx pipe: "+existing_lyxpipe
+			print("using lyx pipe: "+existing_lyxpipe)
 			p = open(existing_lyxpipe, 'a')
 			p.write("LYXCMD:referencer:citation-insert:" + keys + "\n")
 			p.close()
 			return True
 		except:
-			print "Error using the lyx pipe"
+			print("Error using the lyx pipe")
 	elif lyxClientBinary is not None:
 		# Compose citation insertion command
 		cmdStr = "LYXCMD:citation-insert " + keys + "\n"

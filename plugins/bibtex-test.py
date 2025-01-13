@@ -45,7 +45,7 @@ def sensitivity_print_bibtex (library, documents):
 def do_print_bibtex (library, documents):
 
 	for doc in documents:
-		print doc.print_bibtex(False, False)
+		print(doc.print_bibtex(False, False))
 
 	dialog = gtk.Dialog (buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 	dialog.set_has_separator (False)
@@ -67,8 +67,8 @@ def do_print_bibtex (library, documents):
 	else:
 		bibtex_text = entry.get_text ()
 		fields = referencer.bibtex_to_fields(bibtex_text)
-		print fields
+		print(fields)
 		for field in fields:
-			print field
+			print(field)
 
 	return True

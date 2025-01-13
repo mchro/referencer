@@ -115,16 +115,16 @@ def do_genkey (library, documents):
 
 		# Make the key unique within this document set
 		append = "b"
-		if assigned_keys.has_key (key):
+		if key in assigned_keys:
 			key += append
 		
 		# Assumes <26 identical keys
-		while assigned_keys.has_key (key):
+		while key in assigned_keys:
 			append = chr(ord(append[0]) + 1)
 			key = key[0:len(key) - 1]
 			key += append
 
-		print key
+		print(key)
 		assigned_keys[key] = True
 			
 		document.set_key (key)

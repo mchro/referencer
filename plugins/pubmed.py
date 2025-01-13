@@ -6,7 +6,7 @@
 
 #   Modified for integration with referencer by John Spray, 2007
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import referencer
 from referencer import _
 
@@ -39,10 +39,10 @@ def get_field (doc, field):
 def text_output(xml):
 	"""Makes a simple text output from the XML returned from efetch"""
 	 
-	print "pubmed.text_output: calling parseString on ", len(xml) , " characters"
-	print "pubmed.text_output: calling parseString on ", xml
+	print("pubmed.text_output: calling parseString on ", len(xml) , " characters")
+	print("pubmed.text_output: calling parseString on ", xml)
 	xmldoc = minidom.parseString(xml)
-	print "pubmed.text_output: made it out of parseString"
+	print("pubmed.text_output: made it out of parseString")
 
 	if len(xmldoc.getElementsByTagName("PubmedArticle")) == 0:
 		raise "pubmed.text_output: PubmedArticle not found"
@@ -70,7 +70,7 @@ def text_output(xml):
 		LastName = get_field (author, "LastName")
 		ForeName = get_field (author, "ForeName")
 		if ForeName == None or ForeName == "":
-			print "pubmed.text_output: Fallback on initials"
+			print("pubmed.text_output: Fallback on initials")
 			ForeName = get_field (author, "Initials")
 		author = '%s, %s' % (LastName, ForeName)
 		authorlist.append(author)
@@ -127,11 +127,11 @@ def referencer_search_TEST (search_text):
 	}
 
 	# try to resolve the PubMed ID of the DOI
-	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' + urllib.urlencode(params)
+	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' + urllib.parse.urlencode(params)
 	data = referencer.download (_("Searching pubmed"), _("Searching pubmed for '%s'") % search_text , url);
 
 	# parse XML output from PubMed...
-	print data
+	print(data)
 	xmldoc = minidom.parseString(data)
 	ids = xmldoc.getElementsByTagName('Id')
 
@@ -158,7 +158,7 @@ def referencer_search_TEST (search_text):
 		'query_key':query_key,
 		'retmax':retmax
 	}
-	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?' + urllib.urlencode(params)
+	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?' + urllib.parse.urlencode(params)
 	data = referencer.download (_("Retrieving pubmed summaries"), _("Retrieving summaries for '%s'") % search_text , url);
 
 	xmldoc = minidom.parseString(data)
@@ -182,7 +182,7 @@ def referencer_search_TEST (search_text):
 
 		results.append ({"token":pmid,"title":title,"author":author})
 
-	print results
+	print(results)
 
 	return results
 
@@ -190,8 +190,8 @@ def referencer_search_result_TEST (token):
 	data = get_citation_from_pmid(token)
 	fields = text_output(data)
 
-	print "referencer_search_result: token = ", token
-	print "referencer_search_result: fields = ", fields
+	print("referencer_search_result: token = ", token)
+	print("referencer_search_result: fields = ", fields)
 
 	dict = {}
 	for field in fields:
@@ -211,7 +211,7 @@ def get_citation_from_doi(query, email='referencer@icculus.org', tool='Reference
 	}
 
 	# try to resolve the PubMed ID of the DOI
-	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' + urllib.urlencode(params)
+	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' + urllib.parse.urlencode(params)
 	data = referencer.download (_("Resolving DOI"), _("Finding PubMed ID from DOI %s") % query , url);
 
 	# parse XML output from PubMed...
@@ -225,7 +225,7 @@ def get_citation_from_doi(query, email='referencer@icculus.org', tool='Reference
 	# get ID
 	id = ids[0].childNodes[0].data
 
-	print "pubmed.get_citation_from_doi: DOI ", query, " has PubMed ID ", id
+	print("pubmed.get_citation_from_doi: DOI ", query, " has PubMed ID ", id)
 
 	return get_citation_from_pmid (id)
  
@@ -239,7 +239,7 @@ def get_citation_from_pmid (pmid, email='referencer@icculus.org', tool='Referenc
 	}
 
 	# get citation info:
-	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?' + urllib.urlencode(params)
+	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?' + urllib.parse.urlencode(params)
 	data = referencer.download (_("Resolving PubMed ID"), _("Fetching metadata from NCBI for PubMed ID %s") % pmid, url);
 
 	return data
@@ -258,20 +258,20 @@ def resolve_metadata (doc, method):
 		elif (method == "pubmed"):
 			xml = get_citation_from_pmid (doc.get_field ("pmid"))
 	except:
-		print "pubmed.resolve_metadata: Got no metadata"
+		print("pubmed.resolve_metadata: Got no metadata")
 		# Couldn't get any metadata
 		return False
 
 	try:
 		items = text_output (xml)
 	except:
-		print "pubmed.resolve_metadata: Couldn't parse metadata"
+		print("pubmed.resolve_metadata: Couldn't parse metadata")
 		# Couldn't parse XML
 		return False
 
 	itemCount = 0
 	for item in items:
-		print "pubmed.resolve_metadata: Setting %s:%s\n" % (item[0], item[1])
+		print("pubmed.resolve_metadata: Setting %s:%s\n" % (item[0], item[1]))
 		if (len(item[1]) > 0):
 			doc.set_field (item[0], item[1])
 			itemCount = itemCount + 1

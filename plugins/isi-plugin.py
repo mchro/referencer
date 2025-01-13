@@ -22,7 +22,7 @@
 import os
 import referencer
 from referencer import _
-import sys, urllib2, urllib
+import sys, urllib.request, urllib.error, urllib.parse, urllib.request, urllib.parse, urllib.error
 import gtk
 
 from xml.dom import minidom
@@ -444,7 +444,7 @@ def getText(nodelist):
             rc.append(node.data)
         elif node.nodeType == node.ELEMENT_NODE:
             rc.append(getText(node.childNodes))
-    return u''.join(rc).strip()
+    return ''.join(rc).strip()
 
 def get_field (doc, field):
     value = doc.getElementsByTagName(field)
@@ -467,7 +467,7 @@ def do_search (document):
 
     url0='http://estipub.isiknowledge.com/esti/cgi?action=search&viewType=xml&mode=GeneralSearch&product=WOS&ServiceName=GeneralSearch&filter=&Start=&End=%d&DestApp=WOS' % (get_MAXRECORDS())
     url0+= "&" + get_query(document) 
-    print "isi query url:", url0
+    print("isi query url:", url0)
     if False: #debugging
         #data0 = open("plugins/isi-plugin-testdata.txt").read()
         data0 = open("plugins/isi-plugin-testdata2.txt").read()
@@ -476,7 +476,7 @@ def do_search (document):
             _("Obtaining data from ISI-WebOfScience"), 
             _("Querying for %s/%s/%s") % (author,title,year), 
             url0)
-    print data0
+    print(data0)
     xmldoc0 = minidom.parseString(data0)
     return xmldoc0
 
@@ -495,7 +495,7 @@ def get_query(document):
     if len(author)>0:
         query['author'] = author
 
-    return urllib.urlencode(query)
+    return urllib.parse.urlencode(query)
 
 def remove_non_ascii_chars(si):
     for s in si:
