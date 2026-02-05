@@ -1,4 +1,3 @@
-import gtk
 import re
 import referencer
 from referencer import _

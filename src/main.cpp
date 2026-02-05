@@ -77,9 +77,9 @@ int main (int argc, char **argv)
 	Py_Initialize ();
 
 	_global_plugins = new PluginManager ();
-	//_global_plugins->scan("./plugins");
-	//_global_plugins->scan(homePlugins);
-	//_global_plugins->scan(PLUGINDIR);
+	_global_plugins->scan("./plugins");
+	_global_plugins->scan(homePlugins);
+	_global_plugins->scan(PLUGINDIR);
 
 	_global_prefs = new Preferences();
 

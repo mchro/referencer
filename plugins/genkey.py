@@ -1,16 +1,16 @@
-#!/usr/bin/env python
- 
+#!/usr/bin/env python3
+
 #  Generate Bob08 Alice99 Alice99b type keys
 
 import referencer
 from referencer import _
 
 import gi
-gi.require_version('Gtk', '2.0')
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk as gtk
 
 referencer_plugin_info = {
-	"author":    "John Spray",  
+	"author":    "John Spray",
 	"version":   "1.1.2",
 	"longname":  _("Generate keys from metadata"),
 	"ui":
@@ -64,29 +64,29 @@ def do_genkey (library, documents):
 		format = "%a%y"
 
 	# Prompt the user for the key format
-	dialog = gtk.Dialog (buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-	dialog.set_has_separator (False)
+	dialog = gtk.Dialog ()
+	dialog.add_buttons (gtk.STOCK_CANCEL, gtk.ResponseType.REJECT, gtk.STOCK_OK, gtk.ResponseType.ACCEPT)
 	dialog.vbox.set_spacing (6)
-	dialog.set_default_response(gtk.RESPONSE_ACCEPT)
+	dialog.set_default_response(gtk.ResponseType.ACCEPT)
 	hbox = gtk.HBox (spacing=6)
-	label = gtk.Label ("Key format:")
+	label = gtk.Label (label="Key format:")
 	entry = gtk.Entry ()
 	entry.set_text (format)
 	entry.set_activates_default(True)
-	dialog.vbox.pack_start (hbox)
-	hbox.pack_start (label)
-	hbox.pack_start (entry)
-	
-	label = gtk.Label ("Markers:\n\t%y = two-digit year\n\t%Y = four-digit year\n\t%a = first author's surname\n\t%t = title without spaces\n\t%w = first meaningful word of title")
-	dialog.vbox.pack_start (label)
+	dialog.vbox.pack_start (hbox, True, True, 0)
+	hbox.pack_start (label, True, True, 0)
+	hbox.pack_start (entry, True, True, 0)
+
+	label = gtk.Label (label="Markers:\n\t%y = two-digit year\n\t%Y = four-digit year\n\t%a = first author's surname\n\t%t = title without spaces\n\t%w = first meaningful word of title")
+	dialog.vbox.pack_start (label, True, True, 0)
 
 	dialog.show_all ()
 	response = dialog.run ()
 	dialog.hide ()
 
-	if (response == gtk.RESPONSE_REJECT):
+	if (response == gtk.ResponseType.REJECT):
 		return False
-	
+
 	format = entry.get_text ()
 
 	for document in documents:
@@ -97,7 +97,7 @@ def do_genkey (library, documents):
 		for c in ":-[]{},+/*.?":
 			title = title.replace(c, '')
 		title_capitalized = "".join([w[0].upper()+w[1:] for w in title.split()])
-		first_word = [w for w in title.split() if 
+		first_word = [w for w in title.split() if
 			w.lower() not in ('a', 'an', 'the')][0]
 		title = title.replace(' ', '')
 
@@ -115,20 +115,20 @@ def do_genkey (library, documents):
 
 		# Make the key unique within this document set
 		append = "b"
-		if assigned_keys.has_key (key):
+		if key in assigned_keys:
 			key += append
-		
+
 		# Assumes <26 identical keys
-		while assigned_keys.has_key (key):
+		while key in assigned_keys:
 			append = chr(ord(append[0]) + 1)
 			key = key[0:len(key) - 1]
 			key += append
 
-		print key
+		print(key)
 		assigned_keys[key] = True
-			
+
 		document.set_key (key)
-	
+
 
 	referencer.pref_set ("genkey_format", format)
 

@@ -28,6 +28,12 @@ Preferences::Preferences ()
 	m_settings = Gio::Settings::create("apps.referencer");
 	m_settings->signal_changed().connect(sigc::mem_fun(*this, &Preferences::onSettingsChange));
 
+	/* Plugin preferences stored in a separate key file since GSettings
+	 * doesn't support dynamic key names */
+	std::string homeDir = Glib::get_home_dir();
+	pluginPrefsPath_ = Glib::build_filename(homeDir, ".referencer", "plugin_prefs");
+	loadPluginPrefs();
+
 	xml_ = Gtk::Builder::create_from_file 
 			(Utility::findDataFile ("preferences.ui"));
 
@@ -432,12 +438,33 @@ void Preferences::onPluginConfigure ()
 	plugin->doConfigure ();
 }
 
+void Preferences::loadPluginPrefs ()
+{
+	try {
+		pluginPrefsKeyFile_.load_from_file(pluginPrefsPath_);
+	} catch (Glib::Error &) {
+		/* File doesn't exist yet, that's fine */
+	}
+}
+
+
+void Preferences::savePluginPrefs ()
+{
+	/* Ensure directory exists */
+	std::string dir = Glib::path_get_dirname(pluginPrefsPath_);
+	g_mkdir_with_parents(dir.c_str(), 0755);
+
+	pluginPrefsKeyFile_.save_to_file(pluginPrefsPath_);
+}
+
+
 /**
  * Store a setting on behalf of a plugin
  */
 void Preferences::setPluginPref (Glib::ustring const &key, Glib::ustring const &value)
 {
-	m_settings->set_string("plugin-" + key, value);
+	pluginPrefsKeyFile_.set_string("plugin", key, value);
+	savePluginPrefs();
 }
 
 
@@ -446,11 +473,9 @@ void Preferences::setPluginPref (Glib::ustring const &key, Glib::ustring const &
  */
 Glib::ustring Preferences::getPluginPref (Glib::ustring const &key)
 {
-	std::vector<Glib::ustring> allkeys = m_settings->list_keys();
-
-	auto foundkey = std::find(std::begin(allkeys), std::end(allkeys), key);
-	if (foundkey != std::end(allkeys))
-		return m_settings->get_string("plugin-" + key);
-	else
+	try {
+		return pluginPrefsKeyFile_.get_string("plugin", key);
+	} catch (Glib::KeyFileError &) {
 		return "";
+	}
 }

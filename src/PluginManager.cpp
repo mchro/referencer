@@ -170,6 +170,12 @@ PluginManager::PluginManager ()
 {
 	PyObject *module = PyModule_Create(&ReferencerModule);
 
+	/* In Python 3, PyModule_Create does not add the module to sys.modules
+	 * (unlike Python 2's Py_InitModule), so we must do it explicitly
+	 * for 'import referencer' to work in plugins */
+	PyObject *sys_modules = PyImport_GetModuleDict();
+	PyDict_SetItemString(sys_modules, "referencer", module);
+
 	PyType_Ready (&t_referencer_document);
 	PyObject_SetAttrString (module, "document", (PyObject*)&t_referencer_document);
 

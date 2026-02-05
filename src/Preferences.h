@@ -112,6 +112,11 @@ private:
 
 	Glib::RefPtr<Gio::Settings> m_settings;
 
+	Glib::KeyFile pluginPrefsKeyFile_;
+	std::string pluginPrefsPath_;
+	void loadPluginPrefs ();
+	void savePluginPrefs ();
+
 public:
 	Preferences ();
 	~Preferences ();

@@ -1,8 +1,8 @@
-#!/usr/bin/env python
- 
+#!/usr/bin/env python3
+
 # ADS metadata scraper, Copyright 2008 John Spray
 
-import urllib
+import urllib.parse
 import re
 import referencer
 from referencer import _
@@ -15,16 +15,15 @@ referencer_plugin_info = {
 	}
 referencer_plugin_capabilities = ["doi"]
 
-# Encoding: every PyUnicode that minidom gives us gets
-# encoded as utf-8 into a PyString, this is what PyString_AsString on the C++
-# side will expect
+# Encoding: in Python3 minidom gives us str directly,
+# which is what PyUnicode_AsUTF8 on the C++ side expects
 def get_field (doc, field):
 	value = doc.getElementsByTagName(field)
-	print "get_field: value = ", value
+	print("get_field: value = ", value)
 	if len(value) == 0:
 		return ""
 	else:
-		return value[0].childNodes[0].data.encode("utf-8")
+		return value[0].childNodes[0].data
 
 def can_resolve_metadata (doc):
     if doc.get_field("doi"):
@@ -41,11 +40,11 @@ def resolve_metadata (doc, method):
 		'doi':doi
 	}
 
-	url = "http://adsabs.harvard.edu/cgi-bin/nph-bib_query?" + urllib.urlencode (params)
+	url = "http://adsabs.harvard.edu/cgi-bin/nph-bib_query?" + urllib.parse.urlencode (params)
 	data = referencer.download (_("Resolving DOI"), _("Fetching metadata from NASA ADS for DOI %s") % doi, url);
 
 	if data.find ("retrieved=\"1\"") == -1:
-		print "Couldn't get info from ADS"
+		print("Couldn't get info from ADS")
 		return False
 
 	fields = []
@@ -56,46 +55,45 @@ def resolve_metadata (doc, method):
 		fields.append (["issue",  get_field(xmldoc, "issue")])
 		fields.append (["year", get_field(xmldoc, "pubdate").partition(' ')[2]])
 		fields.append (["Month", str.lower(get_field(xmldoc, "pubdate").partition(' ')[0])])
-		fields.append (["Adsurl", xmldoc.getElementsByTagName('url')[-1].childNodes[0].data.encode("utf-8")])
+		fields.append (["Adsurl", xmldoc.getElementsByTagName('url')[-1].childNodes[0].data])
 		fields.append (["Adsbibcode",  get_field(xmldoc, "bibcode")])
 
 		# ADS include full bibliographic information in the journal XML tag,
 		# see http://doc.adsabs.harvard.edu/abs_doc/help_pages/taggedformat.html#jnl
 		journal = get_field(xmldoc, "journal")
-		journalString = re.sub(', [vV]ol(ume|\.).*', '', journal)
+		journalString = re.sub(r', [vV]ol(ume|\.).*', '', journal)
 		fields.append (["journal", journalString])
 
 		authors = xmldoc.getElementsByTagName('author')
 		authorString = ""
 		first = True
 		for author in authors:
-			name = author.childNodes[0].data.encode("utf-8")
+			name = author.childNodes[0].data
 			if (first == False):
 				authorString += " and "
-			print "got author", name
+			print("got author", name)
 			authorString += name
 			first = False
 
 		fields.append (["author", authorString])
 
-		print "appended authors"
+		print("appended authors")
 		pages = get_field (xmldoc, "page")
-		print "getting lastPage"
+		print("getting lastPage")
 		lastPage = get_field (xmldoc, "lastpage")
 		if (len(lastPage) > 0):
 			pages += "-"
 			pages += lastPage
 
-		print "got pages " , pages
+		print("got pages " , pages)
 		fields.append (["pages", pages])
-		print "appended pages"
+		print("appended pages")
 	except:
-		print "exception"
+		print("exception")
 		return False
 
 	for field in fields:
 		if len(field[1]) > 0:
-			doc.set_field(field[0], field[1]) 
+			doc.set_field(field[0], field[1])
 
 	return True
-

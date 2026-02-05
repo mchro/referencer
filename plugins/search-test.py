@@ -1,16 +1,13 @@
-#!/usr/bin/env python
- 
+#!/usr/bin/env python3
+
 #  Generate Bob08 Alice99 Alice99b type keys
 
 import os
 import referencer
 from referencer import _
 
-import gtk
-import time
-
 referencer_plugin_info = {
-	"author":    "John Spray",  
+	"author":    "John Spray",
 	"version":   "0.0",
 	"longname":  "Search test",
 }

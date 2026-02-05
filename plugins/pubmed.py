@@ -1,12 +1,12 @@
-#!/usr/bin/env python
- 
+#!/usr/bin/env python3
+
 #   Simple script to query pubmed for a DOI
 #   (c) Simon Greenhill, 2007
 #   http://simon.net.nz/
 
 #   Modified for integration with referencer by John Spray, 2007
 
-import urllib
+import urllib.parse
 import referencer
 from referencer import _
 
@@ -22,9 +22,8 @@ referencer_plugin_capabilities = ["doi", "pubmed"]
 
 
 
-# Encoding: every PyUnicode that minidom gives us gets
-# encoded as utf-8 into a PyString, this is what PyString_AsString on the C++
-# side will expect
+# Encoding: in Python3 minidom gives us str directly,
+# which is what PyUnicode_AsUTF8 on the C++ side expects
 def get_field (doc, field):
 	value = doc.getElementsByTagName(field)
 	if len(value) == 0:
@@ -33,19 +32,19 @@ def get_field (doc, field):
 		if (len(value[0].childNodes) == 0):
 			return ""
 		else:
-			return value[0].childNodes[0].data.encode("utf-8")
+			return value[0].childNodes[0].data
 
 
 def text_output(xml):
 	"""Makes a simple text output from the XML returned from efetch"""
-	 
-	print "pubmed.text_output: calling parseString on ", len(xml) , " characters"
-	print "pubmed.text_output: calling parseString on ", xml
+
+	print("pubmed.text_output: calling parseString on ", len(xml) , " characters")
+	print("pubmed.text_output: calling parseString on ", xml)
 	xmldoc = minidom.parseString(xml)
-	print "pubmed.text_output: made it out of parseString"
+	print("pubmed.text_output: made it out of parseString")
 
 	if len(xmldoc.getElementsByTagName("PubmedArticle")) == 0:
-		raise "pubmed.text_output: PubmedArticle not found"
+		raise Exception("pubmed.text_output: PubmedArticle not found")
 
 	output = []
 
@@ -57,8 +56,8 @@ def text_output(xml):
 	for articleid in articleids:
 		idtype = articleid.attributes.get("IdType").value
 		if "doi" == idtype and len(articleid.childNodes) != 0:
-			output.append (["doi", articleid.childNodes[0].data.encode("utf-8")])
-	 
+			output.append (["doi", articleid.childNodes[0].data])
+
 	title = get_field (xmldoc, "ArticleTitle")
 	output.append (["title", title])
 	abstract = get_field (xmldoc, "AbstractText")
@@ -70,11 +69,11 @@ def text_output(xml):
 		LastName = get_field (author, "LastName")
 		ForeName = get_field (author, "ForeName")
 		if ForeName == None or ForeName == "":
-			print "pubmed.text_output: Fallback on initials"
+			print("pubmed.text_output: Fallback on initials")
 			ForeName = get_field (author, "Initials")
 		author = '%s, %s' % (LastName, ForeName)
 		authorlist.append(author)
-	 
+
 	authorstring = ""
 	for author in authorlist:
 		if (len(authorstring) > 0):
@@ -98,7 +97,7 @@ def text_output(xml):
 			output.append (["volume", volume])
 			output.append (["number", issue])
 			output.append (["year", year])
-	
+
 	pages = get_field (xmldoc, "MedlinePgn")
 	output.append (["pages", pages])
 
@@ -112,7 +111,7 @@ def text_output(xml):
 
 def referencer_search_TEST (search_text):
 	email='referencer@icculus.org'
-   	tool='Referencer'
+	tool='Referencer'
 	database='pubmed'
 
 	retmax = 100
@@ -127,27 +126,27 @@ def referencer_search_TEST (search_text):
 	}
 
 	# try to resolve the PubMed ID of the DOI
-	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' + urllib.urlencode(params)
+	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' + urllib.parse.urlencode(params)
 	data = referencer.download (_("Searching pubmed"), _("Searching pubmed for '%s'") % search_text , url);
 
 	# parse XML output from PubMed...
-	print data
+	print(data)
 	xmldoc = minidom.parseString(data)
 	ids = xmldoc.getElementsByTagName('Id')
 
 	# nothing found, exit
 	# FIXME: not really an error
 	if len(ids) == 0:
-		raise "pubmed.referencer_search: no results"
+		raise Exception("pubmed.referencer_search: no results")
 
 	webenv = xmldoc.getElementsByTagName('WebEnv')
 	if len(webenv) == 0:
-		raise "pubmed.referencer_search: no webenv"
+		raise Exception("pubmed.referencer_search: no webenv")
 	webenv = webenv[0].childNodes[0].data
 
 	query_key = xmldoc.getElementsByTagName('QueryKey')
 	if len(query_key) == 0:
-		raise "pubmed.referencer_search: no query_key"
+		raise Exception("pubmed.referencer_search: no query_key")
 	query_key = query_key[0].childNodes[0].data
 
 	params = {
@@ -158,7 +157,7 @@ def referencer_search_TEST (search_text):
 		'query_key':query_key,
 		'retmax':retmax
 	}
-	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?' + urllib.urlencode(params)
+	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?' + urllib.parse.urlencode(params)
 	data = referencer.download (_("Retrieving pubmed summaries"), _("Retrieving summaries for '%s'") % search_text , url);
 
 	xmldoc = minidom.parseString(data)
@@ -172,7 +171,7 @@ def referencer_search_TEST (search_text):
 		if len(id) !=0:
 			pmid = id[0].childNodes[0].data
 		else:
-			raise "pubmed.referencer_search: docsum without id"
+			raise Exception("pubmed.referencer_search: docsum without id")
 
 		for childnode in docsum.getElementsByTagName("Item"):
 			if childnode.getAttribute("Name") == "Title":
@@ -182,7 +181,7 @@ def referencer_search_TEST (search_text):
 
 		results.append ({"token":pmid,"title":title,"author":author})
 
-	print results
+	print(results)
 
 	return results
 
@@ -190,8 +189,8 @@ def referencer_search_result_TEST (token):
 	data = get_citation_from_pmid(token)
 	fields = text_output(data)
 
-	print "referencer_search_result: token = ", token
-	print "referencer_search_result: fields = ", fields
+	print("referencer_search_result: token = ", token)
+	print("referencer_search_result: fields = ", fields)
 
 	dict = {}
 	for field in fields:
@@ -211,7 +210,7 @@ def get_citation_from_doi(query, email='referencer@icculus.org', tool='Reference
 	}
 
 	# try to resolve the PubMed ID of the DOI
-	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' + urllib.urlencode(params)
+	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' + urllib.parse.urlencode(params)
 	data = referencer.download (_("Resolving DOI"), _("Finding PubMed ID from DOI %s") % query , url);
 
 	# parse XML output from PubMed...
@@ -220,15 +219,15 @@ def get_citation_from_doi(query, email='referencer@icculus.org', tool='Reference
 
 	# nothing found, exit
 	if len(ids) == 0:
-		raise "pubmed.get_citation_from_doi: DOI not found"
+		raise Exception("pubmed.get_citation_from_doi: DOI not found")
 
 	# get ID
 	id = ids[0].childNodes[0].data
 
-	print "pubmed.get_citation_from_doi: DOI ", query, " has PubMed ID ", id
+	print("pubmed.get_citation_from_doi: DOI ", query, " has PubMed ID ", id)
 
 	return get_citation_from_pmid (id)
- 
+
 def get_citation_from_pmid (pmid, email='referencer@icculus.org', tool='Referencer', database='pubmed'):
 	params = {
 		'db':database,
@@ -239,7 +238,7 @@ def get_citation_from_pmid (pmid, email='referencer@icculus.org', tool='Referenc
 	}
 
 	# get citation info:
-	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?' + urllib.urlencode(params)
+	url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?' + urllib.parse.urlencode(params)
 	data = referencer.download (_("Resolving PubMed ID"), _("Fetching metadata from NCBI for PubMed ID %s") % pmid, url);
 
 	return data
@@ -258,22 +257,21 @@ def resolve_metadata (doc, method):
 		elif (method == "pubmed"):
 			xml = get_citation_from_pmid (doc.get_field ("pmid"))
 	except:
-		print "pubmed.resolve_metadata: Got no metadata"
+		print("pubmed.resolve_metadata: Got no metadata")
 		# Couldn't get any metadata
 		return False
 
 	try:
 		items = text_output (xml)
 	except:
-		print "pubmed.resolve_metadata: Couldn't parse metadata"
+		print("pubmed.resolve_metadata: Couldn't parse metadata")
 		# Couldn't parse XML
 		return False
 
 	itemCount = 0
 	for item in items:
-		print "pubmed.resolve_metadata: Setting %s:%s\n" % (item[0], item[1])
+		print("pubmed.resolve_metadata: Setting %s:%s\n" % (item[0], item[1]))
 		if (len(item[1]) > 0):
 			doc.set_field (item[0], item[1])
 			itemCount = itemCount + 1
 	return itemCount > 0
-

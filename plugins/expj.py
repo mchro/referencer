@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Referencer plugin to expand/shorten Journal names using a database file
@@ -32,10 +32,12 @@ expj_journaldb_ordered.txt expj_journaldb.txt
 
 import os
 import sys
-import urllib
+import urllib.request
 
-import gtk  # for dialogs
-import string  # for string handling
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk as gtk
+
 import difflib  # to find closest matching entry for replacement
 
 import referencer
@@ -134,11 +136,11 @@ def do_expand(library, documents):
             sv = shortv.strip().lower()
             try:
                 # try direct lookup in database
-                idx = map(string.lower, contracted).index(sv)
+                idx = [s.lower() for s in contracted].index(sv)
                 repl = expanded[idx]
             except ValueError:
                 try:  # check if journal name is already the expanded version
-                    idx = map(string.lower, expanded).index(sv)
+                    idx = [s.lower() for s in expanded].index(sv)
                     if idx:
                         continue
                 except:
@@ -148,51 +150,49 @@ def do_expand(library, documents):
                 match = difflib.get_close_matches(shortv, contracted,
                                                   DEFAULTMAXSUGGESTIONS)
                 # Prompt the user for the correct entry
-                dialog = gtk.Dialog(buttons=(gtk.STOCK_CANCEL,
-                                             gtk.RESPONSE_REJECT,
-                                             gtk.STOCK_OK,
-                                             gtk.RESPONSE_ACCEPT))
-                dialog.set_has_separator(False)
+                dialog = gtk.Dialog()
+                dialog.add_buttons(gtk.STOCK_CANCEL, gtk.ResponseType.REJECT,
+                                   gtk.STOCK_OK, gtk.ResponseType.ACCEPT)
                 dialog.vbox.set_spacing(6)
-                dialog.set_default_response(gtk.RESPONSE_ACCEPT)
+                dialog.set_default_response(gtk.ResponseType.ACCEPT)
 
                 if DISPHINT:
                     text = _('No Journal name database found: consider '
                              'checking the plugin configuration dialog to '
                              'download a prepared list')
-                    label = gtk.Label(text)
+                    label = gtk.Label(label=text)
                     label.set_line_wrap(True)
                     image = gtk.Image()
                     image.set_from_stock(gtk.STOCK_DIALOG_INFO,
-                                         gtk.ICON_SIZE_DIALOG)
+                                         gtk.IconSize.DIALOG)
                     hbox = gtk.HBox()
-                    hbox.pack_start(image)
-                    hbox.pack_start(label)
-                    dialog.vbox.pack_start(hbox, padding=3)
+                    hbox.pack_start(image, True, True, 0)
+                    hbox.pack_start(label, True, True, 0)
+                    dialog.vbox.pack_start(hbox, True, True, 3)
 
                 if len(match) == 0:
-                    label = gtk.Label(_("No match found in database!\nEnter "
+                    label = gtk.Label(label=_("No match found in database!\nEnter "
                                         "replacement entry for journal") +
                                       " '%s'" % (shortv))
                 else:
-                    label = gtk.Label(_("No exact match found!\n"
+                    label = gtk.Label(label=_("No exact match found!\n"
                                         "Choose correct entry for journal") +
                                       " '%s'" % (shortv))
-                dialog.vbox.pack_start(label)
+                dialog.vbox.pack_start(label, True, True, 0)
                 for i in range(len(match)):
                     rbname = expanded[contracted.index(match[i])]
                     if i == 0:
-                        rb = gtk.RadioButton(None, rbname)
+                        rb = gtk.RadioButton.new_with_label_from_widget(None, rbname)
                         rb.set_active(True)
                     else:
-                        rb = gtk.RadioButton(rb, rbname)
-                    dialog.vbox.pack_start(rb)
+                        rb = gtk.RadioButton.new_with_label_from_widget(rb, rbname)
+                    dialog.vbox.pack_start(rb, True, True, 0)
 
                 hbox = gtk.HBox(spacing=6)
                 if len(match) != 0:
-                    rb = gtk.RadioButton(rb, _("Custom:"))
+                    rb = gtk.RadioButton.new_with_label_from_widget(rb, _("Custom:"))
                 else:
-                    rb = gtk.Label(_("Replacement:"))
+                    rb = gtk.Label(label=_("Replacement:"))
 
                 def activate_custom(widget, rb):
                     """
@@ -207,20 +207,20 @@ def do_expand(library, documents):
                 if len(match) != 0:
                     entry.connect("changed", activate_custom, rb)
 
-                dialog.vbox.pack_start(hbox)
-                hbox.pack_start(rb)
-                hbox.pack_start(entry)
-                dialog.vbox.pack_start(hbox)
+                dialog.vbox.pack_start(hbox, True, True, 0)
+                hbox.pack_start(rb, True, True, 0)
+                hbox.pack_start(entry, True, True, 0)
+                dialog.vbox.pack_start(hbox, True, True, 0)
                 dialog.set_focus(entry)
 
                 cb = gtk.CheckButton(label=_("Add replacement to database"))
-                dialog.vbox.pack_start(cb)
+                dialog.vbox.pack_start(cb, True, True, 0)
 
                 dialog.show_all()
                 response = dialog.run()
                 dialog.hide()
 
-                if (response == gtk.RESPONSE_REJECT):
+                if (response == gtk.ResponseType.REJECT):
                     continue  # do not change anthing and continue
 
                 # obtain users choice
@@ -264,11 +264,11 @@ def do_shorten(library, documents):
         if longv != "":
             lv = longv.strip().lower()
             try:  # look for exact match in database
-                idx = map(string.lower, expanded).index(lv)
+                idx = [s.lower() for s in expanded].index(lv)
                 repl = contracted[idx]
             except ValueError:
                 try:  # check if journal name is already the shortened version
-                    idx = map(string.lower, contracted).index(lv)
+                    idx = [s.lower() for s in contracted].index(lv)
                     if idx:
                         continue
                 except:
@@ -278,51 +278,49 @@ def do_shorten(library, documents):
                 match = difflib.get_close_matches(longv, expanded,
                                                   DEFAULTMAXSUGGESTIONS)
                 # Prompt the user for the correct entry
-                dialog = gtk.Dialog(buttons=(gtk.STOCK_CANCEL,
-                                             gtk.RESPONSE_REJECT,
-                                             gtk.STOCK_OK,
-                                             gtk.RESPONSE_ACCEPT))
-                dialog.set_has_separator(False)
+                dialog = gtk.Dialog()
+                dialog.add_buttons(gtk.STOCK_CANCEL, gtk.ResponseType.REJECT,
+                                   gtk.STOCK_OK, gtk.ResponseType.ACCEPT)
                 dialog.vbox.set_spacing(6)
-                dialog.set_default_response(gtk.RESPONSE_ACCEPT)
+                dialog.set_default_response(gtk.ResponseType.ACCEPT)
 
                 if DISPHINT:
                     text = _('No Journal name database found: consider '
                              'checking the plugin configuration dialog to '
                              'download a prepared list')
-                    label = gtk.Label(text)
+                    label = gtk.Label(label=text)
                     label.set_line_wrap(True)
                     image = gtk.Image()
                     image.set_from_stock(gtk.STOCK_DIALOG_INFO,
-                                         gtk.ICON_SIZE_DIALOG)
+                                         gtk.IconSize.DIALOG)
                     hbox = gtk.HBox()
-                    hbox.pack_start(image)
-                    hbox.pack_start(label)
-                    dialog.vbox.pack_start(hbox, padding=3)
+                    hbox.pack_start(image, True, True, 0)
+                    hbox.pack_start(label, True, True, 0)
+                    dialog.vbox.pack_start(hbox, True, True, 3)
 
                 if len(match) == 0:
-                    label = gtk.Label(_("No match found in database!\nEnter "
+                    label = gtk.Label(label=_("No match found in database!\nEnter "
                                         "replacement entry for journal") +
                                       " '%s'" % (longv))
                 else:
-                    label = gtk.Label(_("No exact match found!\n"
+                    label = gtk.Label(label=_("No exact match found!\n"
                                         "Choose correct entry for journal") +
                                       " '%s'" % (longv))
-                dialog.vbox.pack_start(label)
+                dialog.vbox.pack_start(label, True, True, 0)
                 for i in range(len(match)):
                     rbname = contracted[expanded.index(match[i])]
                     if i == 0:
-                        rb = gtk.RadioButton(None, rbname)
+                        rb = gtk.RadioButton.new_with_label_from_widget(None, rbname)
                         rb.set_active(True)
                     else:
-                        rb = gtk.RadioButton(rb, rbname)
-                    dialog.vbox.pack_start(rb)
+                        rb = gtk.RadioButton.new_with_label_from_widget(rb, rbname)
+                    dialog.vbox.pack_start(rb, True, True, 0)
 
                 hbox = gtk.HBox(spacing=6)
                 if len(match) != 0:
-                    rb = gtk.RadioButton(rb, _("Custom:"))
+                    rb = gtk.RadioButton.new_with_label_from_widget(rb, _("Custom:"))
                 else:
-                    rb = gtk.Label(_("Replacement:"))
+                    rb = gtk.Label(label=_("Replacement:"))
 
                 def activate_custom(widget, rb):
                     """
@@ -337,20 +335,20 @@ def do_shorten(library, documents):
                 if len(match) != 0:
                     entry.connect("changed", activate_custom, rb)
 
-                dialog.vbox.pack_start(hbox)
-                hbox.pack_start(rb)
-                hbox.pack_start(entry)
-                dialog.vbox.pack_start(hbox)
+                dialog.vbox.pack_start(hbox, True, True, 0)
+                hbox.pack_start(rb, True, True, 0)
+                hbox.pack_start(entry, True, True, 0)
+                dialog.vbox.pack_start(hbox, True, True, 0)
                 dialog.set_focus(entry)
 
                 cb = gtk.CheckButton(label=_("Add replacement to database"))
-                dialog.vbox.pack_start(cb)
+                dialog.vbox.pack_start(cb, True, True, 0)
 
                 dialog.show_all()
                 response = dialog.run()
                 dialog.hide()
 
-                if (response == gtk.RESPONSE_REJECT):
+                if (response == gtk.ResponseType.REJECT):
                     continue  # do not change anthing and continue
 
                 # obtain users choice
@@ -440,15 +438,15 @@ def download_db(link):
     if DEBUG:
         print("expj: Download link '%s'" % link)
     try:
-        filename, headers = urllib.urlretrieve(link, reporthook=dlProgress)
+        filename, headers = urllib.request.urlretrieve(link, reporthook=dlProgress)
     except IOError as err:
-        downloadException(err.strerror)
+        downloadException(str(err))
         return
 
-    # check typ of download before proceeding
-    if headers.type != 'text/plain':
+    # check type of download before proceeding
+    if headers.get_content_type() != 'text/plain':
         downloadException("Document type must be text/plain and not %s"
-                          % headers.type)
+                          % headers.get_content_type())
         return
     # get download
     with open(filename) as fid:
@@ -477,11 +475,12 @@ def download_db(link):
 
 class downloadException(gtk.Dialog):
     def __init__(self, errmsg, parent=None):
-        gtk.Dialog.__init__(self, "expj plugin",
-                            parent,
-                            gtk.DIALOG_MODAL |
-                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_OK, gtk.RESPONSE_OK))
+        gtk.Dialog.__init__(self,
+                            title="expj plugin",
+                            transient_for=parent,
+                            flags=gtk.DialogFlags.MODAL |
+                            gtk.DialogFlags.DESTROY_WITH_PARENT)
+        self.add_buttons(gtk.STOCK_OK, gtk.ResponseType.OK)
         text = """
 <b>    expj Download Error</b>
 
@@ -493,7 +492,7 @@ Check the specified link and try again
 
         label = gtk.Label()
         label.set_markup(text)
-        self.vbox.pack_start(label)
+        self.vbox.pack_start(label, True, True, 0)
         self.vbox.show_all()
         self.run()
         self.destroy()
@@ -501,19 +500,20 @@ Check the specified link and try again
 
 class preferencesDialog(gtk.Dialog):
     def __init__(self, parent=None):
-        gtk.Dialog.__init__(self, "expj plugin configuration",
-                            parent,
-                            gtk.DIALOG_MODAL |
-                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                             gtk.STOCK_OK, gtk.RESPONSE_OK))
+        gtk.Dialog.__init__(self,
+                            title="expj plugin configuration",
+                            transient_for=parent,
+                            flags=gtk.DialogFlags.MODAL |
+                            gtk.DialogFlags.DESTROY_WITH_PARENT)
+        self.add_buttons(gtk.STOCK_CANCEL, gtk.ResponseType.REJECT,
+                         gtk.STOCK_OK, gtk.ResponseType.OK)
 
-        label = gtk.Label(_("Journal name database download link:"))
+        label = gtk.Label(label=_("Journal name database download link:"))
         self.dllink = gtk.Entry()
         self.dllink.set_text(DEFAULTDOWNLOAD)
 
-        self.vbox.pack_start(label, padding=3)
-        self.vbox.pack_start(self.dllink, padding=3)
+        self.vbox.pack_start(label, True, True, 3)
+        self.vbox.pack_start(self.dllink, True, True, 3)
 
         hbox = gtk.HBox()
         text = _('The above link should direct to a text file following the '
@@ -528,10 +528,10 @@ class preferencesDialog(gtk.Dialog):
         label.set_markup(text)
         label.set_line_wrap(True)
         image = gtk.Image()
-        image.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_DIALOG)
-        hbox.pack_start(image)
-        hbox.pack_start(label)
-        self.vbox.pack_start(hbox, padding=3)
+        image.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.IconSize.DIALOG)
+        hbox.pack_start(image, True, True, 0)
+        hbox.pack_start(label, True, True, 0)
+        self.vbox.pack_start(hbox, True, True, 3)
         self.vbox.show_all()
 
 
@@ -545,5 +545,5 @@ def referencer_config():
     response = prefs.run()
     link = prefs.dllink.get_text()
     prefs.destroy()
-    if response == int(gtk.RESPONSE_OK):
+    if response == gtk.ResponseType.OK:
         download_db(link)

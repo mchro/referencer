@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
- 
+
 #  Add quote in lyx using lyxclient
 
 import os
@@ -73,7 +73,7 @@ for dir in os.environ['PATH'].split (os.pathsep):
 	exe = os.path.join (dir, "lyxclient")
 	if (os.path.exists(exe)):
 		lyxClientBinary = exe
-		print "\tFound lyxclient at %s\n" % exe
+		print("\tFound lyxclient at %s\n" % exe)
 		break
 
 
@@ -87,7 +87,7 @@ def do_cite (library, documents):
 		empty = False
 
 	if empty:
-		raise "No keys"
+		raise Exception("No keys")
 		return False
 
 	existing_lyxpipe = None
@@ -96,15 +96,15 @@ def do_cite (library, documents):
 	elif os.path.exists(DEFAULTPIPE):
 		existing_lyxpipe = DEFAULTPIPE
 
-	if existing_lyxpipe is not None:	
+	if existing_lyxpipe is not None:
 		try:
-			print "using lyx pipe: "+existing_lyxpipe
+			print("using lyx pipe: "+existing_lyxpipe)
 			p = open(existing_lyxpipe, 'a')
 			p.write("LYXCMD:referencer:citation-insert:" + keys + "\n")
 			p.close()
 			return True
 		except:
-			print "Error using the lyx pipe"
+			print("Error using the lyx pipe")
 	elif lyxClientBinary is not None:
 		# Compose citation insertion command
 		cmdStr = "LYXCMD:citation-insert " + keys + "\n"
@@ -114,10 +114,9 @@ def do_cite (library, documents):
 			return False
 
 		if retval != 0:
-			raise "LyXClient failed, is LyX running?"
+			raise Exception("LyXClient failed, is LyX running?")
 	else:
-		raise "Couldn't find lyxclient"
+		raise Exception("Couldn't find lyxclient")
 		#return False
 
 	return True
-

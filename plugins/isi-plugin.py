@@ -1,6 +1,6 @@
-#!/usr/bin/env python
- 
-# A referencer plugin to get document info from ISI Web of Science using 
+#!/usr/bin/env python3
+
+# A referencer plugin to get document info from ISI Web of Science using
 # the Title/Author/Year fields of the document (any or all of them)
 #
 # Copyright 2008 Mario Castro, Yoav Avitzour
@@ -22,8 +22,12 @@
 import os
 import referencer
 from referencer import _
-import sys, urllib2, urllib
-import gtk
+import sys
+import urllib.parse
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk as gtk
 
 from xml.dom import minidom
 
@@ -59,7 +63,7 @@ referencer_plugin_info = {
                 </placeholder>
             </popup>
         </ui>
-        
+
         """,
     "longname": _("ISI Web of Science resolver (requires subscription)"),
     "action": _("Get metadata from ISI Web of Science"),
@@ -188,29 +192,32 @@ class isiRec:
 
 class preferencesDialog(gtk.Dialog):
     def __init__(self, parent = None):
-        gtk.Dialog.__init__(self,"ISI plugin preferences",
-                            parent,
-                            gtk.DIALOG_MODAL | 
-                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                             gtk.STOCK_OK, gtk.RESPONSE_OK))
+        gtk.Dialog.__init__(self,
+                            title="ISI plugin preferences",
+                            transient_for=parent,
+                            flags=gtk.DialogFlags.MODAL |
+                            gtk.DialogFlags.DESTROY_WITH_PARENT)
+        self.add_buttons(gtk.STOCK_CANCEL, gtk.ResponseType.REJECT,
+                         gtk.STOCK_OK, gtk.ResponseType.OK)
         hbox = gtk.HBox()
-        label = gtk.Label("Maximum no. of records to retreive from ISI")
-        adjustment = gtk.Adjustment(value=get_MAXRECORDS(), lower=0, upper=100, 
-                                    step_incr=1, page_incr=1)
-        self.MaxRecords = gtk.SpinButton(adjustment,1)
-        hbox.pack_start(label)
-        hbox.pack_start(self.MaxRecords)
-        self.vbox.pack_start(hbox,padding=3)
+        label = gtk.Label(label="Maximum no. of records to retreive from ISI")
+        adjustment = gtk.Adjustment(value=get_MAXRECORDS(), lower=0, upper=100,
+                                    step_increment=1, page_increment=1)
+        self.MaxRecords = gtk.SpinButton()
+        self.MaxRecords.set_adjustment(adjustment)
+        self.MaxRecords.set_digits(0)
+        hbox.pack_start(label, True, True, 0)
+        hbox.pack_start(self.MaxRecords, True, True, 0)
+        self.vbox.pack_start(hbox, True, True, 3)
         hbox = gtk.HBox()
         text = """The ISI plugin uses the Title, Author and Year to find a matching record in the ISI database. If there is more than one match, a Record Chooser dialog opens. Set here the maximum number of records to retrieve for such cases."""
-        label = gtk.Label(text)
+        label = gtk.Label(label=text)
         label.set_line_wrap(True)
         image = gtk.Image()
-        image.set_from_stock(gtk.STOCK_DIALOG_INFO,gtk.ICON_SIZE_DIALOG)
-        hbox.pack_start(image)
-        hbox.pack_start(label)
-        self.vbox.pack_start(hbox,padding=3)
+        image.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.IconSize.DIALOG)
+        hbox.pack_start(image, True, True, 0)
+        hbox.pack_start(label, True, True, 0)
+        self.vbox.pack_start(hbox, True, True, 3)
         self.vbox.show_all()
 
 class documentDisplay(gtk.Window):
@@ -224,19 +231,19 @@ class documentDisplay(gtk.Window):
         self.add(self.vbox)
         if document is not None:
             fields = ['title','author','journal','year','pages']
-            table = gtk.Table(len(fields),2)
+            table = gtk.Table(n_rows=len(fields), n_columns=2)
             row = 0
             for field in fields:
                 label = gtk.Label()
                 label.set_markup("<b>"+field.title()+": "+"</b>")
                 label.set_alignment(0.0, 0.5)
-                value = gtk.Label(document.get_field(field))
+                value = gtk.Label(label=document.get_field(field))
                 value.set_line_wrap(True)
-                value.set_alignment(0.0, 0.5) 
-                table.attach(label,0,1,row,row+1,gtk.FILL)
-                table.attach(value,1,2,row,row+1,gtk.EXPAND|gtk.FILL)
+                value.set_alignment(0.0, 0.5)
+                table.attach(label,0,1,row,row+1,gtk.AttachOptions.FILL,0,0,0)
+                table.attach(value,1,2,row,row+1,gtk.AttachOptions.EXPAND|gtk.AttachOptions.FILL,0,0,0)
                 row += 1
-            self.vbox.pack_start(table)
+            self.vbox.pack_start(table, True, True, 0)
         self.vbox.show_all()
 
     def set_position(self):
@@ -248,14 +255,15 @@ class documentDisplay(gtk.Window):
 
 class serverException(gtk.Dialog):
     def __init__(self, err, parent=None):
-        gtk.Dialog.__init__(self,"ISI plugin",
-                            parent,
-                            gtk.DIALOG_MODAL | 
-                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_OK, gtk.RESPONSE_OK))
+        gtk.Dialog.__init__(self,
+                            title="ISI plugin",
+                            transient_for=parent,
+                            flags=gtk.DialogFlags.MODAL |
+                            gtk.DialogFlags.DESTROY_WITH_PARENT)
+        self.add_buttons(gtk.STOCK_OK, gtk.ResponseType.OK)
         text = """
 <b>   ISI Error</b>
-        
+
 The server returned an error:
 "%s"
 
@@ -263,38 +271,39 @@ Your current IP address probably does not have access to the ISI webservice.
 """ % (err)
         label = gtk.Label()
         label.set_markup(text)
-        self.vbox.pack_start(label)
+        self.vbox.pack_start(label, True, True, 0)
         self.vbox.show_all()
 
 class noRecordFound(gtk.Dialog):
     def __init__(self, document = None, parent = None):
-        gtk.Dialog.__init__(self,"ISI plugin",
-                            parent,
-                            gtk.DIALOG_MODAL | 
-                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_OK, gtk.RESPONSE_OK))
+        gtk.Dialog.__init__(self,
+                            title="ISI plugin",
+                            transient_for=parent,
+                            flags=gtk.DialogFlags.MODAL |
+                            gtk.DialogFlags.DESTROY_WITH_PARENT)
+        self.add_buttons(gtk.STOCK_OK, gtk.ResponseType.OK)
         text = """
 <b>   ISI query did not find any matching records</b>
-        
+
  You may try one of the following:
 
  * Remove words representing symbols from the title
    (such as alpha, \\alpha, etc.)
  * Remove hyphened words from the title
- * Remember that the ISI database does not contain 
+ * Remember that the ISI database does not contain
    records earlier than 1975
 """
         label = gtk.Label()
         label.set_markup(text)
-        self.vbox.pack_start(label)
+        self.vbox.pack_start(label, True, True, 0)
         self.vbox.show_all()
-        self.showdoc = gtk.Button("Show document")
+        self.showdoc = gtk.Button(label="Show document")
         self.showdoc.connect("clicked",self.show_document_details)
         self.showdoc.show()
         label = gtk.Label()
         label.show()
-        self.action_area.pack_start(self.showdoc)
-        self.action_area.pack_start(label,True,True)
+        self.action_area.pack_start(self.showdoc, True, True, 0)
+        self.action_area.pack_start(label,True,True, 0)
         self.action_area.reorder_child(self.showdoc,0)
         self.action_area.reorder_child(label,1)
         self.docDisp = documentDisplay(document,self)
@@ -310,25 +319,26 @@ class noRecordFound(gtk.Dialog):
 
 class recordChooser(gtk.Dialog):
     def __init__(self,document, nrecs, records, parent = None):
-        gtk.Dialog.__init__(self,"ISI record chooser dialog",
-                            parent,
-                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                             gtk.STOCK_OK, gtk.RESPONSE_OK))
+        gtk.Dialog.__init__(self,
+                            title="ISI record chooser dialog",
+                            transient_for=parent,
+                            flags=gtk.DialogFlags.DESTROY_WITH_PARENT)
+        self.add_buttons(gtk.STOCK_CANCEL, gtk.ResponseType.REJECT,
+                         gtk.STOCK_OK, gtk.ResponseType.OK)
         self.document = document
         self.records = records
 
-        label = gtk.Label("Found %d records, showing first %d" % (nrecs, len(records)))
+        label = gtk.Label(label="Found %d records, showing first %d" % (nrecs, len(records)))
         self.vbox.pack_start(label,False,False,0)
 
         self.recTree = gtk.TreeStore(bool,str,str,bool)
-        self.treeview = gtk.TreeView(self.recTree)
-        self.tvcolumn0 = gtk.TreeViewColumn()  
-        self.tvcolumn1 = gtk.TreeViewColumn()  
-        self.tvcolumn2 = gtk.TreeViewColumn()  
+        self.treeview = gtk.TreeView(model=self.recTree)
+        self.tvcolumn0 = gtk.TreeViewColumn()
+        self.tvcolumn1 = gtk.TreeViewColumn()
+        self.tvcolumn2 = gtk.TreeViewColumn()
         scwindow = gtk.ScrolledWindow()
-        scwindow.set_policy(gtk.POLICY_AUTOMATIC,gtk.POLICY_AUTOMATIC)
-        scwindow.add_with_viewport(self.treeview)
+        scwindow.set_policy(gtk.PolicyType.AUTOMATIC,gtk.PolicyType.AUTOMATIC)
+        scwindow.add(self.treeview)
         self.vbox.pack_start(scwindow,True,True,0)
         self.treeview.append_column(self.tvcolumn0)
         self.treeview.append_column(self.tvcolumn1)
@@ -336,7 +346,7 @@ class recordChooser(gtk.Dialog):
         self.tcell = gtk.CellRendererText()
         self.bcell = gtk.CellRendererToggle()
         self.bcell.set_radio(True)
-        self.bcell.connect("toggled", self.toggled_cb, (self.recTree, 3)) 
+        self.bcell.connect("toggled", self.toggled_cb, (self.recTree, 3))
         self.bcell.set_property('activatable',True)
         self.tvcolumn0.pack_start(self.bcell, True)
         self.tvcolumn0.add_attribute(self.bcell, 'visible', 0)
@@ -352,13 +362,13 @@ class recordChooser(gtk.Dialog):
         self.treeview.expand_all()
         self.resize(400,300)
         self.vbox.show_all()
-        self.showdoc = gtk.Button("Show document")
+        self.showdoc = gtk.Button(label="Show document")
         self.showdoc.connect("clicked",self.show_document_details)
         self.showdoc.show()
         label = gtk.Label()
         label.show()
-        self.action_area.pack_start(self.showdoc)
-        self.action_area.pack_start(label,True,True)
+        self.action_area.pack_start(self.showdoc, True, True, 0)
+        self.action_area.pack_start(label,True,True, 0)
         self.action_area.reorder_child(self.showdoc,0)
         self.action_area.reorder_child(label,1)
         self.docDisp = documentDisplay(self.document,self)
@@ -377,10 +387,10 @@ class recordChooser(gtk.Dialog):
                 self.recTree.set(self.recTree.insert(outeriter,innerrow),
                                  0,False,
                                  1,self.fields[innerrow],
-                                 2,eval('rec.'+self.fields[innerrow]),
+                                 2,getattr(rec, self.fields[innerrow]),
                                  3,False)
             outerrow += 1
-            
+
     def toggled_cb(self, cell, path, user_data):
         model, column = user_data
         for row in model:
@@ -400,7 +410,7 @@ class recordChooser(gtk.Dialog):
 
 def capitalize_authors(authors):
     spltau = authors.split()
-    nau = (len(spltau)+1)/3
+    nau = (len(spltau)+1)//3
     for i in range(nau):
         spltau[3*i] = spltau[3*i].capitalize()
         spltau[3*i+1] = spltau[3*i+1].upper()
@@ -418,8 +428,8 @@ def get_fields (doc, field, separator):
         else:
             #for items in value:
             for index in range(length-1):
-                output+=value[index].childNodes[0].data.encode("utf-8")+separator
-        return output+value[length-1].childNodes[0].data.encode("utf-8")
+                output+=value[index].childNodes[0].data+separator
+        return output+value[length-1].childNodes[0].data
 
 def get_last_field (doc, field):
     value = doc.getElementsByTagName(field)
@@ -430,7 +440,7 @@ def get_last_field (doc, field):
             return ""
         else:
             for items in value:
-                last=items.childNodes[0].data.encode("utf-8")
+                last=items.childNodes[0].data
             return last
 
 def getText(nodelist):
@@ -444,7 +454,7 @@ def getText(nodelist):
             rc.append(node.data)
         elif node.nodeType == node.ELEMENT_NODE:
             rc.append(getText(node.childNodes))
-    return u''.join(rc).strip()
+    return ''.join(rc).strip()
 
 def get_field (doc, field):
     value = doc.getElementsByTagName(field)
@@ -466,17 +476,17 @@ def do_search (document):
     author= document.get_field ("author")
 
     url0='http://estipub.isiknowledge.com/esti/cgi?action=search&viewType=xml&mode=GeneralSearch&product=WOS&ServiceName=GeneralSearch&filter=&Start=&End=%d&DestApp=WOS' % (get_MAXRECORDS())
-    url0+= "&" + get_query(document) 
-    print "isi query url:", url0
+    url0+= "&" + get_query(document)
+    print("isi query url:", url0)
     if False: #debugging
         #data0 = open("plugins/isi-plugin-testdata.txt").read()
         data0 = open("plugins/isi-plugin-testdata2.txt").read()
     else:
         data0 = referencer.download(
-            _("Obtaining data from ISI-WebOfScience"), 
-            _("Querying for %s/%s/%s") % (author,title,year), 
+            _("Obtaining data from ISI-WebOfScience"),
+            _("Querying for %s/%s/%s") % (author,title,year),
             url0)
-    print data0
+    print(data0)
     xmldoc0 = minidom.parseString(data0)
     return xmldoc0
 
@@ -495,7 +505,7 @@ def get_query(document):
     if len(author)>0:
         query['author'] = author
 
-    return urllib.urlencode(query)
+    return urllib.parse.urlencode(query)
 
 def remove_non_ascii_chars(si):
     for s in si:
@@ -512,7 +522,7 @@ def choose_record(document,nrecs,isi_recs):
         records.append(irec)
     recChoose = recordChooser(document,nrecs,records)
     response = recChoose.run()
-    if response == int(gtk.RESPONSE_OK):
+    if response == gtk.ResponseType.OK:
         currentrec = recChoose.current_record
         currentrec = records[int(currentrec)]
     else:
@@ -542,8 +552,6 @@ def do_action(library,documents):
 def referencer_config():
     prefs = preferencesDialog()
     response = prefs.run()
-    if response == int(gtk.RESPONSE_OK):
+    if response == gtk.ResponseType.OK:
         set_MAXRECORDS(prefs.MaxRecords.get_value_as_int())
     prefs.destroy()
-
-
