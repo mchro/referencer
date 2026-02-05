@@ -41,6 +41,7 @@ class Document {
 	~Document ();
 	Document ();
 	Document (Document const & x);
+	Document& operator= (Document const &) = default;
 	Document (Glib::ustring const &filename);
 	Document (
 		Glib::ustring const &filename,
