@@ -25,7 +25,7 @@ PluginManager *_global_plugins;
 
 /* Return the number of arguments of the application command line */
 static PyObject*
-referencer_download(PyObject *self, PyObject *args)
+referencer_download(PyObject *, PyObject *args)
 {
 	PyObject *url = PyTuple_GetItem (args, 2);
 	PyObject *title = PyTuple_GetItem (args, 0);
@@ -54,7 +54,7 @@ referencer_download(PyObject *self, PyObject *args)
  * pairs compatible with set_field in PythonDocument
  */
 static PyObject *
-referencer_bibtex_to_fields (PyObject *self, PyObject *args)
+referencer_bibtex_to_fields (PyObject *, PyObject *args)
 {
 	/* Get bibtex string from argument tuple */
 	PyObject *bibtex_py_str = PyTuple_GetItem (args, 0);
@@ -84,7 +84,7 @@ referencer_bibtex_to_fields (PyObject *self, PyObject *args)
 
 /* Call gettext */
 static PyObject*
-referencer_gettext(PyObject *self, PyObject *args)
+referencer_gettext(PyObject *, PyObject *args)
 {
 	PyObject *str = PyTuple_GetItem (args, 0);
 	return PyUnicode_FromString (_(PyUnicode_AsUTF8(str)));
@@ -92,7 +92,7 @@ referencer_gettext(PyObject *self, PyObject *args)
 
 
 static PyObject*
-referencer_pref_set (PyObject *self, PyObject *args)
+referencer_pref_set (PyObject *, PyObject *args)
 {
 	PyObject *key = PyTuple_GetItem (args, 0);
 	PyObject *value = PyTuple_GetItem (args, 1);
@@ -104,7 +104,7 @@ referencer_pref_set (PyObject *self, PyObject *args)
 
 
 static PyObject*
-referencer_pref_get (PyObject *self, PyObject *args)
+referencer_pref_get (PyObject *, PyObject *args)
 {
 	PyObject *key = PyTuple_GetItem (args, 0);
 	Glib::ustring value = _global_prefs->getPluginPref (PyUnicode_AsUTF8(key));
@@ -116,7 +116,7 @@ referencer_pref_get (PyObject *self, PyObject *args)
  * Update UI, and teturn true if the user has requested cancellation
  */
 static PyObject *
-referencer_poll_cancellation (PyObject *self, PyObject *args)
+referencer_poll_cancellation (PyObject *, PyObject *)
 {
 	/* Advance GTK+ */
 	while (Gtk::Main::events_pending())
@@ -158,7 +158,11 @@ static struct PyModuleDef ReferencerModule = {
     "referencer",        // Module name
     NULL,                // Module documentation (can be NULL)
     -1,                  // Size of per-interpreter state (or -1 if state is global)
-    ReferencerMethods    // Methods of the module
+    ReferencerMethods,   // Methods of the module
+    NULL,                // m_slots
+    NULL,                // m_traverse
+    NULL,                // m_clear
+    NULL                 // m_free
 };
 
 

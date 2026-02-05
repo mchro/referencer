@@ -9,7 +9,7 @@
 
 #include "PythonDocument.h"
 
-static PyObject *referencer_document_get_key (PyObject *self, PyObject *args)
+static PyObject *referencer_document_get_key (PyObject *self, PyObject *)
 {
 	Glib::ustring value = ((referencer_document*)self)->doc_->getKey ();
 	return PyUnicode_FromString(value.c_str());
@@ -24,7 +24,7 @@ static PyObject *referencer_document_set_key (PyObject *self, PyObject *args)
 }
 
 
-static PyObject *referencer_document_get_filename (PyObject *self, PyObject *args)
+static PyObject *referencer_document_get_filename (PyObject *self, PyObject *)
 {
 	Glib::ustring value = ((referencer_document*)self)->doc_->getFileName ();
 	return PyUnicode_FromString(value.c_str());
@@ -38,7 +38,7 @@ static PyObject *referencer_document_set_filename (PyObject *self, PyObject *arg
 	return Py_BuildValue ("i", 0);
 }
 
-static PyObject *referencer_document_get_notes(PyObject *self, PyObject *args)
+static PyObject *referencer_document_get_notes(PyObject *self, PyObject *)
 {
 	Glib::ustring value = ((referencer_document*)self)->doc_->getNotes ();
 	return PyUnicode_FromString(value.c_str());
@@ -53,7 +53,7 @@ static PyObject *referencer_document_set_notes (PyObject *self, PyObject *args)
 }
 
 
-static PyObject *referencer_document_get_type (PyObject *self, PyObject *args)
+static PyObject *referencer_document_get_type (PyObject *self, PyObject *)
 {
 	try {
 		Glib::ustring value = ((referencer_document*)self)->doc_->getBibData().getType();
@@ -91,13 +91,13 @@ static PyObject *referencer_document_get_field (PyObject *self, PyObject *args)
 	}
 }
 
-static PyObject *referencer_document_get_fields (PyObject *self, PyObject *args)
+static PyObject *referencer_document_get_fields (PyObject *, PyObject *)
 {
 	/* TODO */
 	return NULL;
 }
 
-static PyObject *referencer_document_set_fields (PyObject *self, PyObject *args)
+static PyObject *referencer_document_set_fields (PyObject *, PyObject *)
 {
 	/* TODO */
 	return NULL;
@@ -134,17 +134,17 @@ static PyObject *referencer_document_print_bibtex (PyObject *self, PyObject *arg
 	return PyUnicode_FromString (bibtex.c_str());
 }
 
-static void referencer_document_dealloc (PyObject *self)
+static void referencer_document_dealloc (PyObject *)
 {
 	DEBUG (">> referencer_document_dealloc");
 }
 
-static PyObject *referencer_document_string (PyObject *self)
+static PyObject *referencer_document_string (PyObject *)
 {
 	return PyUnicode_FromString ("Referencer object representing a single document");
 }
 
-static int referencer_document_init (PyObject *self, PyObject *args, PyObject *kwds)
+static int referencer_document_init (PyObject *, PyObject *, PyObject *)
 {
 	DEBUG (">> referencer_document_init");
 
@@ -154,7 +154,7 @@ static int referencer_document_init (PyObject *self, PyObject *args, PyObject *k
 
 static PyMemberDef referencer_document_members[] = {
 	{"ptr", T_INT, offsetof(referencer_document, doc_), 0, "Pointer to C++ Document"},
-	{NULL}
+	{NULL, 0, 0, 0, NULL}
 };
 
 static PyMethodDef referencer_document_methods[] = {
@@ -175,6 +175,8 @@ static PyMethodDef referencer_document_methods[] = {
 	{NULL, NULL, 0, NULL}
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 PyTypeObject t_referencer_document = {
 	PyVarObject_HEAD_INIT(NULL, 0)
 	"referencer.document",
@@ -216,3 +218,4 @@ PyTypeObject t_referencer_document = {
 	PyType_GenericNew,
 	PyObject_Del
 };
+#pragma GCC diagnostic pop
