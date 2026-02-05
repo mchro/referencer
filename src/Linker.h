@@ -9,7 +9,7 @@ class RefWindow;
 
 class Linker {
 	public:
-	virtual bool canLink (Document const *doc) {return false;};
+	virtual bool canLink (Document const *) {return false;};
 	virtual void doLink (Document *doc);
 	virtual Glib::ustring getURL (Document *doc);
 	virtual Glib::ustring getLabel () {return Glib::ustring();};

@@ -139,7 +139,7 @@ class Plugin
 		Plugin () {enabled_ = false; loaded_ = false;}
 		virtual ~Plugin () {};
 
-		virtual void load (std::string const &moduleName) {};
+		virtual void load (std::string const &) {};
 		
 		/* Lookup metadata, and add to document. Return true on success */
 		virtual bool resolve (Document &doc) = 0;
@@ -147,7 +147,7 @@ class Plugin
 		 * Should not incur any network traffic.
 		 * Return: -1 if unable, or a positive integer if an attempt can be made.
 		 * 	(Suggested: integer from 1-100, depending on how well it might go.) */
-		virtual int canResolve (Document &doc) {
+		virtual int canResolve (Document &) {
 			return 1;
 		};
 
@@ -162,8 +162,8 @@ class Plugin
 		{
 			return ActionList ();
 		};
-		virtual bool doAction          (Glib::ustring const action, std::vector<Document*>) {return false;}
-		virtual bool updateSensitivity (Glib::ustring const action, std::vector<Document*>) {return true;}
+		virtual bool doAction          (Glib::ustring const, std::vector<Document*>) {return false;}
+		virtual bool updateSensitivity (Glib::ustring const, std::vector<Document*>) {return true;}
 
 		/* Configuration hook */
 		virtual bool canConfigure () {return false;}
@@ -189,8 +189,8 @@ class Plugin
 		
 		/* Searching */
 		virtual bool canSearch () {return false;}
-		virtual SearchResults doSearch (Glib::ustring const &searchTerms) {return SearchResults();}
-		virtual Document getSearchResult (Glib::ustring const &token) {throw std::logic_error("Unimplemented");};
+		virtual SearchResults doSearch (Glib::ustring const &) {return SearchResults();}
+		virtual Document getSearchResult (Glib::ustring const &) {throw std::logic_error("Unimplemented");};
 
 	protected:
 		bool loaded_;

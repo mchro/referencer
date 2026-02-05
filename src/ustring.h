@@ -35,7 +35,7 @@ namespace Util {
 class BadConversion 
 {
 public:
-    BadConversion(const Glib::ustring& msg) {}
+    BadConversion(const Glib::ustring&) {}
 };
 
 /// \brief Splits a string into tokens.
