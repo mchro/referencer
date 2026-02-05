@@ -399,8 +399,8 @@ void DocumentView::onDocMouseMotion (GdkEventMotion* event)
 
 
 void DocumentView::onIconsDragData (
-	const Glib::RefPtr <Gdk::DragContext> &context,
-	int n1, int n2, const Gtk::SelectionData &sel, guint n3, guint n4)
+	const Glib::RefPtr <Gdk::DragContext> &,
+	int, int, const Gtk::SelectionData &sel, guint, guint)
 {
 	DEBUG ("Type '" + sel.get_data_type () + "'");
 
@@ -1256,7 +1256,7 @@ void DocumentView::select (Document *document)
 }
 
 
-void DocumentView::redraw (Document *document)
+void DocumentView::redraw (Document *)
 {
 	/* Even if we bother poking a particular document IconView
 	 * seems to redraw the whole kaboodle */

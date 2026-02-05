@@ -826,7 +826,7 @@ void RefWindow::tagNameEditingStarted (
 
 
 void RefWindow::tagNameEdited (
-	Glib::ustring const &text1,
+	Glib::ustring const &,
 	Glib::ustring const &text2)
 {
 	// Text1 is the row number, text2 is the new setting
@@ -864,7 +864,7 @@ void RefWindow::tagNameEdited (
 
 
 bool RefWindow::tagSeparator (
-        const Glib::RefPtr<Gtk::TreeModel> &model,
+        const Glib::RefPtr<Gtk::TreeModel> &,
         const Gtk::TreeModel::iterator &iter)
 {
         return ((*iter)[taguidcol_] == SEPARATOR_UID);
@@ -1031,7 +1031,7 @@ void RefWindow::onQuit ()
 }
 
 
-bool RefWindow::onDelete (GdkEventAny *ev)
+bool RefWindow::onDelete (GdkEventAny *)
 {
 	if (ensureSaved ())
 		return false;
@@ -3215,7 +3215,7 @@ void RefWindow::SearchDialog::search ()
 	}
 }
 
-void RefWindow::SearchDialog::resultActivated (const Gtk::TreePath &path, Gtk::TreeViewColumn * col)
+void RefWindow::SearchDialog::resultActivated (const Gtk::TreePath &, Gtk::TreeViewColumn *)
 {
 	addSelected ();
 }

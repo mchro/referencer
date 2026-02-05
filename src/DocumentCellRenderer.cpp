@@ -8,7 +8,7 @@
 #include "DocumentView.h"
 #include "DocumentCellRenderer.h"
 
-void DocumentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget,
+void DocumentCellRenderer::get_preferred_width_vfunc(Gtk::Widget&,
                                        int& min_w,
                                        int& nat_w) const
 {
@@ -21,7 +21,7 @@ void DocumentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget,
     nat_w = calc_width;
 }
 
-void DocumentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget,
+void DocumentCellRenderer::get_preferred_height_vfunc(Gtk::Widget&,
                                         int& min_h,
                                         int& nat_h) const
 {
@@ -42,8 +42,8 @@ void DocumentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget,
 }
 
 void DocumentCellRenderer::render_vfunc( const Cairo::RefPtr<Cairo::Context>& cr,
-                           Gtk::Widget& widget,
-                           const Gdk::Rectangle& background_area,
+                           Gtk::Widget&,
+                           const Gdk::Rectangle&,
                            const Gdk::Rectangle& cell_area,
                            Gtk::CellRendererState flags )
 {

@@ -40,7 +40,7 @@ class CrossRefParser : public Glib::Markup::Parser {
 
 	private:
 	virtual void on_start_element (
-		Glib::Markup::ParseContext& context,
+		Glib::Markup::ParseContext&,
 		const Glib::ustring& element_name,
 		const Glib::Markup::Parser::AttributeMap& attributes)
 	{
@@ -85,7 +85,7 @@ class CrossRefParser : public Glib::Markup::Parser {
 	}
 
 	virtual void	on_end_element (
-		Glib::Markup::ParseContext& context,
+		Glib::Markup::ParseContext&,
 		const Glib::ustring& element)
 	{
 		if (Glib::str_has_prefix (text_, "<![CDATA[") &&
@@ -136,14 +136,14 @@ class CrossRefParser : public Glib::Markup::Parser {
 
  	// Called on error, including one thrown by an overridden virtual method.
 	virtual void on_error (
-		Glib::Markup::ParseContext& context,
-		const Glib::MarkupError& error)
+		Glib::Markup::ParseContext&,
+		const Glib::MarkupError&)
 	{
 		DEBUG ("CrossRefParser: Parse Error!");
 	}
 
 	virtual void on_text (
-		Glib::Markup::ParseContext& context,
+		Glib::Markup::ParseContext&,
 		const Glib::ustring& text)
 	{
 		text_ += text;

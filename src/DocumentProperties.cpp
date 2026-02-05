@@ -462,7 +462,7 @@ void DocumentProperties::onDoiEntryChanged()
   updateSensitivity ();
 }
 
-void DocumentProperties::onExtraFieldEdited (const Glib::ustring& path, const Glib::ustring& text)
+void DocumentProperties::onExtraFieldEdited (const Glib::ustring&, const Glib::ustring&)
 {
 	updateSensitivity ();
 }

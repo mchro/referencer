@@ -52,7 +52,7 @@ void Linker::createUI (RefWindow *window, DocumentView *view)
 	window->uimanager_->add_ui_from_string (ui);
 }
 
-Glib::ustring Linker::getURL (Document *doc)
+Glib::ustring Linker::getURL (Document *)
 {
 	DEBUG ("Linker::getURL called erroneously!");
 	return "";
